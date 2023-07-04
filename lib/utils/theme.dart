@@ -6,7 +6,7 @@ class Apptheme {
     return ThemeData(
       useMaterial3: true,
       scaffoldBackgroundColor: isDark ? Colors.grey[900] : Colors.grey[100],
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
+      colorScheme: ColorScheme.fromSeed(seedColor: Colors.brown),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
@@ -19,7 +19,7 @@ class Apptheme {
         color: isDark ? Colors.grey[900] : Colors.grey[100],
         titleTextStyle: kTextStyle(
           context: context,
-          size: 18,
+          size: 20,
         ),
         foregroundColor: isDark ? Colors.white : Colors.black,
       ),

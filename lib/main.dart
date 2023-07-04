@@ -21,6 +21,7 @@ void main() async {
         builder: (context, _, __) {
           var isDark = Provider.of<ThemeProvider>(context).isDark;
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             home: const Home(),
             theme: Apptheme.themeData(isDark, context),
           );
