@@ -1,6 +1,7 @@
 import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
 import 'package:cloud_vault/views/widgets/custom_tile.dart';
+import 'package:cloud_vault/views/widgets/file_types.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -38,7 +39,7 @@ class Home extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 3, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 10),
         child: ListView(
           children: const [
             CustomTile(iconData: Icons.image, text: "Images"),
@@ -49,7 +50,21 @@ class Home extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          showModalBottomSheet(
+            backgroundColor: theme.isDark
+                ? const Color.fromARGB(255, 46, 47, 50)
+                : Colors.white,
+            context: context,
+            builder: (context) {
+              return SizedBox(
+                height: 45.h,
+                width: 100.w,
+                child: const FileTypes(),
+              );
+            },
+          );
+        },
         child: const Icon(Icons.add),
       ),
     );

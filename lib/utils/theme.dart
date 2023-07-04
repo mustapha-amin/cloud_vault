@@ -5,7 +5,8 @@ class Apptheme {
   static ThemeData themeData(bool isDark, BuildContext context) {
     return ThemeData(
       useMaterial3: true,
-      scaffoldBackgroundColor: isDark ? Colors.grey[900] : Colors.grey[100],
+      scaffoldBackgroundColor:
+          isDark ? const Color.fromARGB(255, 31, 31, 31) : Colors.grey[100],
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.brown),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
