@@ -46,6 +46,7 @@ class Home extends StatelessWidget {
             CustomTile(iconData: Icons.video_collection, text: "Videos"),
             CustomTile(iconData: Icons.audio_file, text: "Audios"),
             CustomTile(iconData: Icons.file_copy, text: "Documents"),
+            
           ],
         ),
       ),
