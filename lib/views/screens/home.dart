@@ -7,10 +7,13 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Cloud vault"),
+        title: const Text("Cloud vault"),
       ),
-      body: Padding(
+      body: const Padding(
         padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+        child: Column(
+          children: []
+        ),
       ),
     );
   }

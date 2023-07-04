@@ -5,13 +5,15 @@ import 'package:sizer/sizer.dart';
 
 import '../providers/theme_provider.dart';
 
- 
-TextStyle kTextStyle(
-    {required BuildContext context, required double size, Color? color, FontWeight? fontWeight}) {
+TextStyle kTextStyle({
+  required BuildContext context,
+  required double size,
+  Color? color,
+  FontWeight? fontWeight,
+}) {
   var provider = Provider.of<ThemeProvider>(context);
-  return GoogleFonts.raleway(
-    color: color ??
-        (provider.isDark ? Colors.white : Colors.black),
+  return GoogleFonts.montserrat(
+    color: color ?? (provider.isDark ? Colors.white : Colors.black),
     fontSize: size.sp,
     fontWeight: fontWeight ?? FontWeight.normal,
   );
