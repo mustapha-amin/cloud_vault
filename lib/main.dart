@@ -1,6 +1,7 @@
 import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/services/theme_prefs.dart';
 import 'package:cloud_vault/utils/theme.dart';
+import 'package:cloud_vault/views/screens/auth/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -22,7 +23,7 @@ void main() async {
           var isDark = Provider.of<ThemeProvider>(context).isDark;
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: const Home(),
+            home: const SignUp(),
             theme: Apptheme.themeData(isDark, context),
           );
         },
