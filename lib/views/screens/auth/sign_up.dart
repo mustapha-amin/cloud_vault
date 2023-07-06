@@ -2,7 +2,10 @@ import 'package:cloud_vault/utils/textfield_decoration.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+
+import '../../../providers/auth_provider.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -34,6 +37,7 @@ class _SignUpState extends State<SignUp> {
     return Scaffold(
       appBar: AppBar(),
       body: ListView(
+        physics: const NeverScrollableScrollPhysics(),
         children: [
           Center(
             child: Text(
@@ -113,7 +117,10 @@ class _SignUpState extends State<SignUp> {
                             size: 13,
                             color: Theme.of(context).primaryColor),
                         text: " Log In",
-                        recognizer: TapGestureRecognizer()..onTap = () {},
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            context.read<AuthProvider>().toggleStatus();
+                          },
                       ),
                     ],
                   ),

@@ -1,7 +1,10 @@
+import 'package:cloud_vault/providers/auth_provider.dart';
+import 'package:cloud_vault/utils/spacings.dart';
 import 'package:cloud_vault/utils/textfield_decoration.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class SignIn extends StatefulWidget {
@@ -32,6 +35,7 @@ class _SignInState extends State<SignIn> {
     return Scaffold(
       appBar: AppBar(),
       body: ListView(
+        physics: const NeverScrollableScrollPhysics(),
         children: [
           Center(
             child: Text(
@@ -44,6 +48,7 @@ class _SignInState extends State<SignIn> {
               ),
             ),
           ),
+          addVerticalSpacing(8.h),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
             child: Column(
@@ -53,12 +58,6 @@ class _SignInState extends State<SignIn> {
                   controller: emailController,
                   decoration: defaultInputDecoration().copyWith(
                     hintText: "Email",
-                  ),
-                ).paddingAll(7),
-                TextFormField(
-                  controller: passwordController,
-                  decoration: defaultInputDecoration().copyWith(
-                    hintText: "Password",
                   ),
                 ).paddingAll(7),
                 ValueListenableBuilder(
@@ -111,7 +110,10 @@ class _SignInState extends State<SignIn> {
                             size: 13,
                             color: Theme.of(context).primaryColor),
                         text: " Sign Up",
-                        recognizer: TapGestureRecognizer()..onTap = () {},
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            context.read<AuthProvider>().toggleStatus();
+                          },
                       ),
                     ],
                   ),

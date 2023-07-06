@@ -1,6 +1,8 @@
+import 'package:cloud_vault/providers/auth_provider.dart';
 import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/services/theme_prefs.dart';
 import 'package:cloud_vault/utils/theme.dart';
+import 'package:cloud_vault/views/screens/auth/authenticate.dart';
 import 'package:cloud_vault/views/screens/auth/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,13 +19,16 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => ThemeProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(),
+        ),
       ],
       child: Sizer(
         builder: (context, _, __) {
           var isDark = Provider.of<ThemeProvider>(context).isDark;
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: const SignUp(),
+            home: const Authenticate(),
             theme: Apptheme.themeData(isDark, context),
           );
         },
