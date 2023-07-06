@@ -1,9 +1,11 @@
 import 'package:cloud_vault/providers/auth_provider.dart';
+import 'package:cloud_vault/providers/auth_status_provider.dart';
 import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/services/theme_prefs.dart';
 import 'package:cloud_vault/utils/theme.dart';
 import 'package:cloud_vault/views/screens/auth/authenticate.dart';
 import 'package:cloud_vault/views/screens/auth/sign_up.dart';
+import 'package:cloud_vault/views/screens/onboarding/onboarding.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -20,6 +22,9 @@ void main() async {
           create: (_) => ThemeProvider(),
         ),
         ChangeNotifierProvider(
+          create: (_) => AuthStatusProvider(),
+        ),
+        ChangeNotifierProvider(
           create: (_) => AuthProvider(),
         ),
       ],
@@ -28,7 +33,7 @@ void main() async {
           var isDark = Provider.of<ThemeProvider>(context).isDark;
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: const Authenticate(),
+            home: const Onboarding(),
             theme: Apptheme.themeData(isDark, context),
           );
         },

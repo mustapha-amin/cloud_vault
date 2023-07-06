@@ -6,7 +6,7 @@ class Apptheme {
     return ThemeData(
       useMaterial3: true,
       scaffoldBackgroundColor:
-          isDark ? const Color.fromARGB(255, 31, 31, 31) : Colors.grey[100],
+          isDark ? const Color.fromARGB(255, 31, 31, 31) : Colors.white,
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.brown),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

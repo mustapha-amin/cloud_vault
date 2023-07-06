@@ -1,4 +1,4 @@
-import 'package:cloud_vault/providers/auth_provider.dart';
+import 'package:cloud_vault/providers/auth_status_provider.dart';
 import 'package:cloud_vault/utils/spacings.dart';
 import 'package:cloud_vault/utils/textfield_decoration.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
@@ -112,7 +112,7 @@ class _SignInState extends State<SignIn> {
                         text: " Sign Up",
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            context.read<AuthProvider>().toggleStatus();
+                            context.read<AuthStatusProvider>().toggleStatus();
                           },
                       ),
                     ],

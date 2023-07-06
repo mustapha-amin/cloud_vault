@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../providers/auth_provider.dart';
+import '../../../providers/auth_status_provider.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -119,7 +119,7 @@ class _SignUpState extends State<SignUp> {
                         text: " Log In",
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            context.read<AuthProvider>().toggleStatus();
+                            context.read<AuthStatusProvider>().toggleStatus();
                           },
                       ),
                     ],
