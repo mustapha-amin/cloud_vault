@@ -1,4 +1,4 @@
-import 'package:cloud_vault/utils/navigate_to.dart';
+import 'package:cloud_vault/utils/navigations.dart';
 import 'package:cloud_vault/views/screens/file_contents.dart';
 import 'package:flutter/material.dart';
 

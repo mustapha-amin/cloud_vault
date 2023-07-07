@@ -35,20 +35,29 @@ class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: ListView(
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          Center(
-            child: Text(
-              "Sign Up",
-              style: kTextStyle(
-                context: context,
-                size: 30,
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.bold,
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Image.asset(
+                'assets/images/auth.png',
+                height: 30.h,
               ),
-            ),
+              Positioned(
+                top: 8,
+                child: Text(
+                  "Sign Up",
+                  style: kTextStyle(
+                    context: context,
+                    size: 35,
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),

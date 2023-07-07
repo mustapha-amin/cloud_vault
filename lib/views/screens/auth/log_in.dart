@@ -33,24 +33,32 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: ListView(
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          Center(
-            child: Text(
-              "Sign In",
-              style: kTextStyle(
-                context: context,
-                size: 30,
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.bold,
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Image.asset(
+                'assets/images/auth.png',
+                height: 30.h,
               ),
-            ),
+              Positioned(
+                top: 8,
+                child: Text(
+                  "Sign In",
+                  style: kTextStyle(
+                    context: context,
+                    size: 35,
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
-          addVerticalSpacing(8.h),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 35),
             child: Column(
               children: [
                 TextFormField(

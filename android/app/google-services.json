@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "863150384396",
+    "firebase_url": "https://cloud-vault-3dc42-default-rtdb.firebaseio.com",
+    "project_id": "cloud-vault-3dc42",
+    "storage_bucket": "cloud-vault-3dc42.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:863150384396:android:db5e796efacc799ef69529",
+        "android_client_info": {
+          "package_name": "com.example.cloud_vault"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "863150384396-tkie222gphmanref0kl7fqf4oocllqgh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFI-UKNg-rxF5SgIHTxwJhNb6OkzCfLjM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "863150384396-tkie222gphmanref0kl7fqf4oocllqgh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
