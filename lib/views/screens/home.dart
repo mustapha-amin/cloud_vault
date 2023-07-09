@@ -3,6 +3,7 @@ import 'package:cloud_vault/utils/auth_constants.dart';
 import 'package:cloud_vault/utils/spacings.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
 import 'package:cloud_vault/views/screens/auth/verify_email.dart';
+import 'package:cloud_vault/views/widgets/drawer.dart';
 import 'package:cloud_vault/views/widgets/file_tile.dart';
 import 'package:cloud_vault/views/widgets/file_types.dart';
 import 'package:cloud_vault/views/widgets/storage_info.dart';
@@ -16,9 +17,10 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var theme = Provider.of<ThemeProvider>(context);
-    return AuthConstants.user!.emailVerified
+    return !AuthConstants.user!.emailVerified
         ? const VerifyEmail()
         : Scaffold(
+            drawer: HomeDrawer(),
             appBar: AppBar(
               title: Text(
                 "Cloud vault",
@@ -27,22 +29,6 @@ class Home extends StatelessWidget {
                     .titleTextStyle!
                     .copyWith(fontWeight: FontWeight.bold, fontSize: 25.sp),
               ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: Switch(
-                    thumbIcon: MaterialStatePropertyAll(
-                      Icon(
-                        theme.isDark
-                            ? Icons.dark_mode_outlined
-                            : Icons.light_mode_outlined,
-                      ),
-                    ),
-                    value: theme.isDark,
-                    onChanged: (_) => theme.toggleTheme(),
-                  ),
-                )
-              ],
             ),
             body: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 10),
@@ -54,7 +40,6 @@ class Home extends StatelessWidget {
                   const FileTile(iconData: Icons.audio_file, title: "Audios"),
                   const FileTile(iconData: Icons.file_copy, title: "Documents"),
                   addVerticalSpacing(10.h),
-                  const StorageInfo()
                 ],
               ),
             ),
