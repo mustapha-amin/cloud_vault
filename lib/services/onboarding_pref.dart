@@ -11,7 +11,7 @@ class OnboardingPreference {
     return themePrefs!.getBool('firstTime') ?? true;
   }
 
-  static savePref(bool mode) async {
-    await themePrefs!.setBool('firstTime', mode);
+  static savePref(bool value) async {
+    await themePrefs!.setBool('firstTime', value);
   }
 }

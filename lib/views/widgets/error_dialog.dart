@@ -10,7 +10,7 @@ void showErrorDialog(BuildContext context, String? text) {
         actionsAlignment: MainAxisAlignment.end,
         content: Text(
           text!,
-          style: kTextStyle(context: context, size: 12),
+          style: kTextStyle(context: context, size: 15),
         ),
         actions: [
           TextButton(
@@ -19,7 +19,7 @@ void showErrorDialog(BuildContext context, String? text) {
             },
             child: Text(
               "Ok",
-              style: kTextStyle(context: context, size: 10),
+              style: kTextStyle(context: context, size: 12),
             ),
           )
         ],

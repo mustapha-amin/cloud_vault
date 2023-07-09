@@ -55,6 +55,8 @@ class AuthProvider extends ChangeNotifier {
         email: email!,
         password: password!,
       );
+      await AuthConstants.user!.sendEmailVerification();
+      toggleLoading();
     } on FirebaseException catch (e) {
       toggleLoading();
       if (e.code == 'user-not-found') {
