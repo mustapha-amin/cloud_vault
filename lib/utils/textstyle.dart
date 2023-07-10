@@ -16,5 +16,6 @@ TextStyle kTextStyle({
     color: color ?? (provider.isDark ? Colors.white : Colors.black),
     fontSize: size.sp,
     fontWeight: fontWeight ?? FontWeight.normal,
+    
   );
 }

@@ -17,50 +17,48 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var theme = Provider.of<ThemeProvider>(context);
-    return !AuthConstants.user!.emailVerified
-        ? const VerifyEmail()
-        : Scaffold(
-            drawer: HomeDrawer(),
-            appBar: AppBar(
-              title: Text(
-                "Cloud vault",
-                style: Theme.of(context)
-                    .appBarTheme
-                    .titleTextStyle!
-                    .copyWith(fontWeight: FontWeight.bold, fontSize: 25.sp),
-              ),
-            ),
-            body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 10),
-              child: ListView(
-                children: [
-                  const FileTile(iconData: Icons.image, title: "Images"),
-                  const FileTile(
-                      iconData: Icons.video_collection, title: "Videos"),
-                  const FileTile(iconData: Icons.audio_file, title: "Audios"),
-                  const FileTile(iconData: Icons.file_copy, title: "Documents"),
-                  addVerticalSpacing(10.h),
-                ],
-              ),
-            ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                showModalBottomSheet(
-                  backgroundColor: theme.isDark
-                      ? const Color.fromARGB(255, 46, 47, 50)
-                      : Colors.white,
-                  context: context,
-                  builder: (context) {
-                    return SizedBox(
-                      height: 45.h,
-                      width: 100.w,
-                      child: const FileTypes(),
-                    );
-                  },
-                );
-              },
-              child: const Icon(Icons.add),
-            ),
+    return Scaffold(
+      drawer: const HomeDrawer(),
+      appBar: AppBar(
+        title: Text(
+          "Cloud vault",
+          style: Theme.of(context)
+              .appBarTheme
+              .titleTextStyle!
+              .copyWith(fontWeight: FontWeight.bold, fontSize: 25.sp),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 10),
+        child: ListView(
+          children: [
+            const FileTile(iconData: Icons.image, title: "Images"),
+            const FileTile(iconData: Icons.video_collection, title: "Videos"),
+            const FileTile(iconData: Icons.audio_file, title: "Audios"),
+            const FileTile(iconData: Icons.file_copy, title: "Documents"),
+            addVerticalSpacing(10.h),
+            const StorageInfo()
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            backgroundColor: theme.isDark
+                ? const Color.fromARGB(255, 46, 47, 50)
+                : Colors.white,
+            context: context,
+            builder: (context) {
+              return SizedBox(
+                height: 45.h,
+                width: 100.w,
+                child: const FileTypes(),
+              );
+            },
           );
+        },
+        child: const Icon(Icons.add),
+      ),
+    );
   }
 }

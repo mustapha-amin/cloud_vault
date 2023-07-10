@@ -7,6 +7,7 @@ void showErrorDialog(BuildContext context, String? text) {
     context: context,
     builder: (context) {
       return AlertDialog(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         actionsAlignment: MainAxisAlignment.end,
         content: Text(
           text!,

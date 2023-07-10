@@ -55,22 +55,23 @@ class HomeDrawer extends StatelessWidget {
                       content: const Text("Do you want to log out?"),
                       actions: [
                         TextButton(
-                            onPressed: () {
-                              context.read<AuthProvider>().signOut();
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Yes")),
+                          onPressed: () {
+                            context.read<AuthProvider>().signOut();
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text("Yes"),
+                        ),
                         TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("No"))
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text("No"),
+                        )
                       ],
                     );
                   });
             },
           ),
-          const StorageInfo()
         ],
       ),
     );

@@ -1,3 +1,5 @@
+import 'package:cloud_vault/models/user.dart';
+import 'package:cloud_vault/services/database.dart';
 import 'package:cloud_vault/utils/auth_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -46,6 +48,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> signUp(
     BuildContext context,
+    String? name,
     String? email,
     String? password,
   ) async {
@@ -55,7 +58,10 @@ class AuthProvider extends ChangeNotifier {
         email: email!,
         password: password!,
       );
-      await AuthConstants.user!.sendEmailVerification();
+      DatabaseService().createUser(CloudVaultUser(
+        name: name,
+        email: email,
+      ));
       toggleLoading();
     } on FirebaseException catch (e) {
       toggleLoading();

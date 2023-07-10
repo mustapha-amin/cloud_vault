@@ -1,3 +1,4 @@
+import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/utils/spacings.dart';
 import 'package:cloud_vault/utils/textfield_decoration.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
@@ -25,6 +26,9 @@ class _SignUpState extends State<SignUp> {
   late FocusNode focusNodeName;
   late FocusNode focusNodeEmail;
   ValueNotifier<bool> isVisible = ValueNotifier<bool>(false);
+  ValueNotifier<String?> fullNameErrorText = ValueNotifier<String?>(null);
+  ValueNotifier<String?> emailErrorText = ValueNotifier<String?>(null);
+  ValueNotifier<String?> passwordErrorText = ValueNotifier<String?>(null);
   final formKey = GlobalKey<FormState>();
 
   @override
@@ -39,6 +43,49 @@ class _SignUpState extends State<SignUp> {
 
   void toggleVisibility() {
     isVisible.value = !isVisible.value;
+  }
+
+  void displaynameError() {
+    nameController.addListener(() {
+      if (nameController.text.isEmpty) {
+        fullNameErrorText.value = 'full name cannot be empty';
+      } else {
+        fullNameErrorText.value = null;
+      }
+    });
+  }
+
+  void displayEmailError() {
+    emailController.addListener(() {
+      if (emailController.text.isEmpty) {
+        emailErrorText.value = 'email cannot be empty';
+      }
+      if (emailController.text.isNotEmpty) {
+        if (!isValidEmail(emailController.text)) {
+          emailErrorText.value = "email is not valid";
+        }
+        if (isValidEmail(emailController.text)) {
+          emailErrorText.value = null;
+        }
+      }
+    });
+  }
+
+  void displayPasswordError() {
+    passwordController.addListener(() {
+      if (passwordController.text.isEmpty) {
+        passwordErrorText.value = 'password cannot be empty';
+      }
+      if (passwordController.text.isNotEmpty) {
+        if (!isValidPassword(passwordController.text)) {
+          passwordErrorText.value =
+              'password must be 8 charcters long an must contain at least one letter and one digit';
+        }
+        if (isValidPassword(passwordController.text)) {
+          passwordErrorText.value = null;
+        }
+      }
+    });
   }
 
   @override
@@ -56,7 +103,9 @@ class _SignUpState extends State<SignUp> {
                       alignment: Alignment.center,
                       children: [
                         Image.asset(
-                          'assets/images/auth.png',
+                          context.watch<ThemeProvider>().isDark
+                              ? 'assets/images/auth-dark.png'
+                              : 'assets/images/auth.png',
                           height: 30.h,
                         ),
                         Positioned(
@@ -65,7 +114,7 @@ class _SignUpState extends State<SignUp> {
                             "Sign Up",
                             style: kTextStyle(
                               context: context,
-                              size: 35,
+                              size: 40,
                               color: Theme.of(context).primaryColor,
                               fontWeight: FontWeight.bold,
                             ),
@@ -77,62 +126,94 @@ class _SignUpState extends State<SignUp> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 30),
                       child: Form(
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
                         key: formKey,
                         child: Column(
                           children: [
-                            TextFormField(
-                              focusNode: focusNodeName,
-                              textInputAction: TextInputAction.next,
-                              controller: nameController,
-                              decoration: defaultInputDecoration().copyWith(
-                                hintText: "Full name",
-                              ),
-                              validator: (val) =>
-                                  val!.isEmpty ? "enter your name" : null,
-                            ).paddingAll(7),
-                            TextFormField(
-                              focusNode: focusNodeEmail,
-                              textInputAction: TextInputAction.next,
-                              keyboardType: TextInputType.emailAddress,
-                              controller: emailController,
-                              decoration: defaultInputDecoration().copyWith(
-                                hintText: "Email",
-                              ),
-                              validator: (val) => emailController.text.isEmpty
-                                  ? 'enter your email'
-                                  : isValidEmail(val!)
-                                      ? null
-                                      : 'invalid email',
-                            ).paddingAll(7),
                             ValueListenableBuilder(
-                              valueListenable: isVisible,
-                              builder: (context, value, _) {
-                                return TextFormField(
-                                  textInputAction: TextInputAction.done,
-                                  controller: passwordController,
-                                  obscureText: !value,
-                                  decoration: defaultInputDecoration().copyWith(
-                                    errorMaxLines: 2,
-                                    hintText: "Password",
-                                    suffixIcon: GestureDetector(
-                                      onTap: () => toggleVisibility(),
-                                      child: Icon(
-                                        value
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
+                                valueListenable: fullNameErrorText,
+                                builder: (_, value, __) {
+                                  return TextFormField(
+                                      focusNode: focusNodeName,
+                                      textInputAction: TextInputAction.next,
+                                      style: kTextStyle(
+                                          context: context, size: 14),
+                                      controller: nameController,
+                                      decoration:
+                                          defaultInputDecoration().copyWith(
+                                        errorStyle: kTextStyle(
+                                          context: context,
+                                          size: 12,
+                                          color: Theme.of(context).primaryColor,
+                                        ),
+                                        errorText: value,
+                                        hintText: "Full name",
+                                      ),
+                                      onChanged: (_) =>
+                                          displaynameError()).paddingAll(7);
+                                }),
+                            ValueListenableBuilder(
+                                valueListenable: emailErrorText,
+                                builder: (_, value, __) {
+                                  return TextFormField(
+                                    style:
+                                        kTextStyle(context: context, size: 14),
+                                    focusNode: focusNodeEmail,
+                                    textInputAction: TextInputAction.next,
+                                    keyboardType: TextInputType.emailAddress,
+                                    controller: emailController,
+                                    decoration:
+                                        defaultInputDecoration().copyWith(
+                                      hintText: "Email",
+                                      errorText: value,
+                                      errorStyle: kTextStyle(
+                                        context: context,
+                                        size: 12,
+                                        color: Theme.of(context).primaryColor,
                                       ),
                                     ),
-                                  ),
-                                  validator: (val) => passwordController
-                                          .text.isEmpty
-                                      ? 'enter your password'
-                                      : isValidPassword(val!)
-                                          ? null
-                                          : 'password must be 8 charcters long an must contain at least one letter and one digit',
-                                ).paddingAll(7);
-                              },
-                            ),
+                                    onChanged: (_) => displayEmailError(),
+                                  ).paddingAll(7);
+                                }),
+                            ValueListenableBuilder(
+                                valueListenable: passwordErrorText,
+                                builder: (_, error, __) {
+                                  return ValueListenableBuilder(
+                                    valueListenable: isVisible,
+                                    builder: (context, value, _) {
+                                      return TextFormField(
+                                        style: kTextStyle(
+                                          context: context,
+                                          size: 14,
+                                        ),
+                                        textInputAction: TextInputAction.done,
+                                        controller: passwordController,
+                                        obscureText: !value,
+                                        decoration:
+                                            defaultInputDecoration().copyWith(
+                                          errorMaxLines: 2,
+                                          hintText: "Password",
+                                          errorText: error,
+                                          errorStyle: kTextStyle(
+                                            context: context,
+                                            size: 12,
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                          ),
+                                          suffixIcon: GestureDetector(
+                                            onTap: () => toggleVisibility(),
+                                            child: Icon(
+                                              value
+                                                  ? Icons.visibility
+                                                  : Icons.visibility_off,
+                                            ),
+                                          ),
+                                        ),
+                                        onChanged: (_) =>
+                                            displayPasswordError(),
+                                      ).paddingAll(7);
+                                    },
+                                  );
+                                }),
                             addVerticalSpacing(5),
                             SizedBox(
                               width: 100.w,
@@ -150,6 +231,7 @@ class _SignUpState extends State<SignUp> {
                                   if (formKey.currentState!.validate()) {
                                     provider.signUp(
                                       context,
+                                      nameController.text,
                                       emailController.text.trim(),
                                       passwordController.text,
                                     );

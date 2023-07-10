@@ -1,6 +1,5 @@
-import 'dart:developer';
-
 import 'package:cloud_vault/providers/auth_status_provider.dart';
+import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/utils/navigations.dart';
 import 'package:cloud_vault/utils/reg_exprs.dart';
 import 'package:cloud_vault/utils/spacings.dart';
@@ -26,6 +25,8 @@ class _SignInState extends State<SignIn> {
   late TextEditingController emailController;
   late TextEditingController passwordController;
   ValueNotifier<bool> isVisible = ValueNotifier<bool>(false);
+  ValueNotifier<String?> emailErrorText = ValueNotifier<String?>(null);
+  ValueNotifier<String?> passwordErrorText = ValueNotifier<String?>(null);
   final formKey = GlobalKey<FormState>();
 
   @override
@@ -39,15 +40,30 @@ class _SignInState extends State<SignIn> {
     isVisible.value = !isVisible.value;
   }
 
-  void printSth() {
+  void displayEmailError() {
     emailController.addListener(() {
-      log(emailController.text);
+      if (emailController.text.isEmpty) {
+        emailErrorText.value = 'email cannot be empty';
+      } else {
+        emailErrorText.value = null;
+      }
+    });
+  }
+
+  void displayPasswordError() {
+    passwordController.addListener(() {
+      if (passwordController.text.isEmpty) {
+        passwordErrorText.value = 'password cannot be empty';
+      } else {
+        passwordErrorText.value = null;
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<AuthProvider>(context);
+    var themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       body: provider.isLoading
           ? const LoadingWidget()
@@ -60,7 +76,9 @@ class _SignInState extends State<SignIn> {
                       alignment: Alignment.center,
                       children: [
                         Image.asset(
-                          'assets/images/auth.png',
+                          themeProvider.isDark
+                              ? 'assets/images/auth-dark.png'
+                              : 'assets/images/auth.png',
                           height: 30.h,
                         ),
                         Positioned(
@@ -69,7 +87,7 @@ class _SignInState extends State<SignIn> {
                             "Sign In",
                             style: kTextStyle(
                               context: context,
-                              size: 35,
+                              size: 40,
                               color: Theme.of(context).primaryColor,
                               fontWeight: FontWeight.bold,
                             ),
@@ -84,38 +102,55 @@ class _SignInState extends State<SignIn> {
                         key: formKey,
                         child: Column(
                           children: [
-                            TextFormField(
-                              keyboardType: TextInputType.emailAddress,
-                              controller: emailController,
-                              decoration: defaultInputDecoration().copyWith(
-                                hintText: "Email",
-                              ),
-                              
-                              onChanged: (_) => setState(() {}),
-                              validator: (val) =>
-                                  val!.isEmpty ? 'email cannot be empty' : null,
-                            ).paddingAll(7),
+                            ValueListenableBuilder(
+                                valueListenable: emailErrorText,
+                                builder: (_, error, __) {
+                                  return TextFormField(
+                                    style:
+                                        kTextStyle(context: context, size: 15),
+                                    keyboardType: TextInputType.emailAddress,
+                                    controller: emailController,
+                                    decoration:
+                                        defaultInputDecoration().copyWith(
+                                      hintText: "Email",
+                                      errorText: error,
+                                    ),
+                                    onChanged: (_) => displayEmailError(),
+                                  ).paddingAll(7);
+                                }),
                             ValueListenableBuilder(
                               valueListenable: isVisible,
-                              builder: (context, value, _) {
-                                return TextFormField(
-                                  controller: passwordController,
-                                  obscureText: !value,
-                                  decoration: defaultInputDecoration().copyWith(
-                                    hintText: "Password",
-                                    suffixIcon: GestureDetector(
-                                      onTap: () => toggleVisibility(),
-                                      child: Icon(
-                                        value
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
+                              builder: (_, visible, __) {
+                                return ValueListenableBuilder(
+                                  valueListenable: passwordErrorText,
+                                  builder: (_, errorvalue, __) {
+                                    return TextFormField(
+                                      style: kTextStyle(
+                                          context: context, size: 15),
+                                      controller: passwordController,
+                                      obscureText: !visible,
+                                      decoration:
+                                          defaultInputDecoration().copyWith(
+                                        errorText: passwordErrorText.value,
+                                        errorStyle: kTextStyle(
+                                          context: context,
+                                          size: 12,
+                                          color: Theme.of(context).primaryColor,
+                                        ),
+                                        hintText: "Password",
+                                        suffixIcon: GestureDetector(
+                                          onTap: () => toggleVisibility(),
+                                          child: Icon(
+                                            visible
+                                                ? Icons.visibility
+                                                : Icons.visibility_off,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                  validator: (val) => val!.isEmpty
-                                      ? 'password cannot be empty'
-                                      : null,
-                                ).paddingAll(7);
+                                      onChanged: (_) => displayPasswordError(),
+                                    ).paddingAll(7);
+                                  },
+                                );
                               },
                             ),
                             SizedBox(
