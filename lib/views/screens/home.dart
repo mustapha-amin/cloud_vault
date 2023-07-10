@@ -5,7 +5,7 @@ import 'package:cloud_vault/utils/textstyle.dart';
 import 'package:cloud_vault/views/screens/auth/verify_email.dart';
 import 'package:cloud_vault/views/widgets/drawer.dart';
 import 'package:cloud_vault/views/widgets/file_tile.dart';
-import 'package:cloud_vault/views/widgets/file_types.dart';
+import 'package:cloud_vault/views/widgets/file_types_modalsheet.dart';
 import 'package:cloud_vault/views/widgets/storage_info.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -52,7 +52,7 @@ class Home extends StatelessWidget {
               return SizedBox(
                 height: 45.h,
                 width: 100.w,
-                child: const FileTypes(),
+                child: const FileTypesModalSheet(),
               );
             },
           );
