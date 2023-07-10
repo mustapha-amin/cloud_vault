@@ -14,7 +14,7 @@ class Wrapper extends StatelessWidget {
       stream: AuthConstants.authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return const VerifyEmail();
+          return const Home();
         } else if (!snapshot.hasData) {
           return const Authenticate();
         }

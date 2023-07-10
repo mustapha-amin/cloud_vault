@@ -1,3 +1,4 @@
+import 'package:cloud_vault/models/user.dart';
 import 'package:cloud_vault/providers/auth_provider.dart';
 import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/utils/auth_constants.dart';
@@ -13,13 +14,14 @@ class HomeDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var themeProvider = Provider.of<ThemeProvider>(context);
+    var userProvider = Provider.of<CloudVaultUser?>(context);
     return Drawer(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       width: 85.w,
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
-            accountName: const Text("John Doe"),
+            accountName: Text(userProvider!.name!),
             accountEmail: Text(AuthConstants.user!.email!),
           ),
           SwitchListTile(

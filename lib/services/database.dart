@@ -9,4 +9,12 @@ class DatabaseService {
     user.id = AuthConstants.userId;
     firebaseFirestore.collection('users').doc(user.id).set(user.toJson());
   }
+
+  Stream<CloudVaultUser?> getUserInfo() {
+    return firebaseFirestore
+        .collection('users')
+        .doc(AuthConstants.userId)
+        .snapshots()
+        .map((snap) => CloudVaultUser.fromFireStore(snap.data()!));
+  }
 }

@@ -1,6 +1,8 @@
+import 'package:cloud_vault/models/user.dart';
 import 'package:cloud_vault/providers/auth_provider.dart';
 import 'package:cloud_vault/providers/auth_status_provider.dart';
 import 'package:cloud_vault/providers/theme_provider.dart';
+import 'package:cloud_vault/services/database.dart';
 import 'package:cloud_vault/services/onboarding_pref.dart';
 import 'package:cloud_vault/services/theme_prefs.dart';
 import 'package:cloud_vault/utils/theme.dart';
@@ -30,6 +32,10 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => AuthProvider(),
         ),
+        StreamProvider.value(
+          value: DatabaseService().getUserInfo(),
+          initialData: CloudVaultUser(name: 'loading...', email: 'loading...'),
+        )
       ],
       child: Sizer(
         builder: (context, _, __) {

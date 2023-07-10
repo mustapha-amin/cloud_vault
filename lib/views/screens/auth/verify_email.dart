@@ -41,12 +41,12 @@ class _VerifyEmailState extends State<VerifyEmail> {
 
   @override
   Widget build(BuildContext context) {
-    return isEmailVerified
+    return AuthConstants.user!.emailVerified
         ? const Home()
         : Scaffold(
-            backgroundColor: Colors.grey[800],
             appBar: AppBar(
-              title: const Text("verify email"),
+              title: const Text("Verify email"),
+              centerTitle: true,
             ),
             body: Padding(
               padding: const EdgeInsets.all(15),
@@ -66,8 +66,13 @@ class _VerifyEmailState extends State<VerifyEmail> {
                         setState(() {
                           message = "A verification email has been sent";
                         });
-                      }).onError((error, stackTrace) => ScaffoldMessenger(
-                              child: SnackBar(content: Text('$error'))));
+                      }).onError(
+                        (error, stackTrace) => ScaffoldMessenger(
+                          child: SnackBar(
+                            content: Text('$error'),
+                          ),
+                        ),
+                      );
                     },
                     icon: const Icon(Icons.email),
                     style: ElevatedButton.styleFrom(
