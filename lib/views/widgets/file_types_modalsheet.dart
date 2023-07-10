@@ -1,10 +1,33 @@
-import 'package:cloud_vault/views/widgets/file_type.dart';
+import 'dart:developer';
+
+import 'package:cloud_vault/views/widgets/file_type.dart' as k;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/textstyle.dart';
 
-class FileTypesModalSheet extends StatelessWidget {
+enum CustomfileType {
+  image,
+  audio,
+  video,
+}
+
+class FileTypesModalSheet extends StatefulWidget {
   const FileTypesModalSheet({super.key});
+
+  @override
+  State<FileTypesModalSheet> createState() => _FileTypesModalSheetState();
+}
+
+class _FileTypesModalSheetState extends State<FileTypesModalSheet> {
+  FilePicker filePicker = FilePicker.platform;
+
+  Future<void> pickFile(FileType fileType) async {
+    FilePickerResult? result = await filePicker.pickFiles(type: fileType);
+    if (result != null) {
+      log(result.files.first.name);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,30 +42,30 @@ class FileTypesModalSheet extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            FileType(
+            k.FileType(
               iconData: Icons.image,
               title: "Image",
-              onTap: () {},
+              onTap: () => pickFile(FileType.image),
             ),
-            FileType(
+            k.FileType(
               iconData: Icons.video_collection_outlined,
               title: "Video",
-              onTap: () {},
+              onTap: () => pickFile(FileType.video),
             ),
           ],
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            FileType(
+            k.FileType(
               iconData: Icons.audio_file_outlined,
               title: "Audio",
-              onTap: () {},
+              onTap: () => pickFile(FileType.audio),
             ),
-            FileType(
+            k.FileType(
               iconData: Icons.file_copy_outlined,
               title: "Document",
-              onTap: () {},
+              onTap: () => pickFile(FileType.custom),
             )
           ],
         ),

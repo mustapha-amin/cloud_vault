@@ -17,4 +17,6 @@ class DatabaseService {
         .snapshots()
         .map((snap) => CloudVaultUser.fromFireStore(snap.data()!));
   }
+
+  
 }

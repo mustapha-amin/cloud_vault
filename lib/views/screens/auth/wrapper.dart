@@ -13,12 +13,14 @@ class Wrapper extends StatelessWidget {
     return StreamBuilder(
       stream: AuthConstants.authStateChanges,
       builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const LoadingWidget();
+        }
         if (snapshot.hasData) {
           return const Home();
-        } else if (!snapshot.hasData) {
+        } else {
           return const Authenticate();
         }
-        return const LoadingWidget();
       },
     );
   }

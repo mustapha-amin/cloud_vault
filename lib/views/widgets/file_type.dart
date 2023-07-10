@@ -5,7 +5,7 @@ import '../../utils/textstyle.dart';
 class FileType extends StatelessWidget {
   final IconData iconData;
   final String title;
-  final Function onTap;
+  final VoidCallback onTap;
   const FileType({
     required this.iconData,
     required this.title,
@@ -18,11 +18,11 @@ class FileType extends StatelessWidget {
     return Column(
       children: [
         IconButton.filledTonal(
-          icon: const Icon(
-            Icons.image_outlined,
+          icon: Icon(
+            iconData,
             color: Colors.black,
           ),
-          onPressed: () => onTap,
+          onPressed: onTap,
         ),
         Text(
           title,
