@@ -13,7 +13,12 @@ class FileTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        navigateTo(context, FileContents(title: title));
+        navigateTo(
+            context,
+            FileContents(
+              title: title.toLowerCase(),
+              iconData: iconData,
+            ));
       },
       child: ListTile(
         leading: Icon(iconData),

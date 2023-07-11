@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:cloud_vault/utils/auth_constants.dart';
+import 'package:cloud_vault/utils/navigations.dart';
+import 'package:cloud_vault/utils/textstyle.dart';
 import 'package:flutter/material.dart';
 
 import '../../../utils/spacings.dart';
@@ -14,26 +16,28 @@ class VerifyEmail extends StatefulWidget {
 
 class _VerifyEmailState extends State<VerifyEmail> {
   var message = "A verification email has been sent";
-  bool isEmailVerified = false;
+  ValueNotifier<bool> isEmailVerified = ValueNotifier<bool>(false);
   Timer? timer;
 
-  Future checkEmailVerified() async {
+  Future checkEmailVerified(BuildContext context) async {
     await AuthConstants.user!.reload();
-    setState(() {
-      isEmailVerified = AuthConstants.user!.emailVerified;
-    });
-    if (isEmailVerified) {
+
+    isEmailVerified.value = AuthConstants.user!.emailVerified;
+
+    if (isEmailVerified.value) {
       timer!.cancel();
+      // ignore: use_build_context_synchronously
+      navigateTo(context, const Home());
     }
   }
 
   @override
   void initState() {
-    isEmailVerified = AuthConstants.user!.emailVerified;
-    if (!isEmailVerified) {
+    isEmailVerified.value = AuthConstants.user!.emailVerified;
+    if (!isEmailVerified.value) {
       AuthConstants.user!.sendEmailVerification();
       timer = Timer.periodic(const Duration(seconds: 3), (_) {
-        checkEmailVerified();
+        checkEmailVerified(context);
       });
     }
     super.initState();
@@ -53,7 +57,14 @@ class _VerifyEmailState extends State<VerifyEmail> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(message, style: const TextStyle(color: Colors.white)),
+                  ValueListenableBuilder(
+                      valueListenable: isEmailVerified,
+                      builder: (_, value, __) {
+                        return Text(
+                          message,
+                          style: kTextStyle(context: context, size: 13),
+                        );
+                      }),
                   addVerticalSpacing(20),
                   ElevatedButton.icon(
                     onPressed: () async {
@@ -64,7 +75,8 @@ class _VerifyEmailState extends State<VerifyEmail> {
                           .sendEmailVerification()
                           .whenComplete(() {
                         setState(() {
-                          message = "A verification email has been sent";
+                          message =
+                              "A verification link has been sent to ${AuthConstants.user!.email}";
                         });
                       }).onError(
                         (error, stackTrace) => ScaffoldMessenger(
@@ -74,10 +86,21 @@ class _VerifyEmailState extends State<VerifyEmail> {
                         ),
                       );
                     },
-                    icon: const Icon(Icons.email),
+                    icon: const Icon(
+                      Icons.email,
+                      color: Colors.white,
+                    ),
                     style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
                         minimumSize: const Size.fromHeight(50)),
-                    label: const Text("Resend email"),
+                    label: Text(
+                      "Resend email",
+                      style: kTextStyle(
+                        context: context,
+                        size: 12,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),

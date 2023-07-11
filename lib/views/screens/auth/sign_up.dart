@@ -2,6 +2,7 @@ import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/utils/spacings.dart';
 import 'package:cloud_vault/utils/textfield_decoration.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
+import 'package:cloud_vault/views/screens/auth/wrapper.dart';
 import 'package:cloud_vault/views/widgets/loading_widget.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../../providers/auth_provider.dart';
 import '../../../providers/auth_status_provider.dart';
+import '../../../utils/navigations.dart';
 import '../../../utils/reg_exprs.dart';
 
 class SignUp extends StatefulWidget {

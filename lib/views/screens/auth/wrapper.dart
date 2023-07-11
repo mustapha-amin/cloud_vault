@@ -17,7 +17,7 @@ class Wrapper extends StatelessWidget {
           return const LoadingWidget();
         }
         if (snapshot.hasData) {
-          return const Home();
+          return const VerifyEmail();
         } else {
           return const Authenticate();
         }

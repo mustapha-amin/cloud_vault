@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/utils/auth_constants.dart';
 import 'package:cloud_vault/utils/spacings.dart';
@@ -43,6 +45,7 @@ class Home extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          log(AuthConstants.userId!);
           showModalBottomSheet(
             backgroundColor: theme.isDark
                 ? const Color.fromARGB(255, 46, 47, 50)

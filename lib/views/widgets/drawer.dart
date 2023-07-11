@@ -14,14 +14,13 @@ class HomeDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var themeProvider = Provider.of<ThemeProvider>(context);
-    var userProvider = Provider.of<CloudVaultUser?>(context);
     return Drawer(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       width: 85.w,
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text(userProvider!.name!),
+            accountName: Text(AuthConstants.user!.displayName!),
             accountEmail: Text(AuthConstants.user!.email!),
           ),
           SwitchListTile(

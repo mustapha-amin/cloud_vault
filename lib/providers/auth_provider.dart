@@ -1,6 +1,9 @@
 import 'package:cloud_vault/models/user.dart';
 import 'package:cloud_vault/services/database.dart';
 import 'package:cloud_vault/utils/auth_constants.dart';
+import 'package:cloud_vault/utils/navigations.dart';
+import 'package:cloud_vault/views/screens/auth/verify_email.dart';
+import 'package:cloud_vault/views/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -28,6 +31,7 @@ class AuthProvider extends ChangeNotifier {
         password: password!,
       );
       toggleLoading();
+      navigateTo(context, Home());
     } on FirebaseException catch (e) {
       toggleLoading();
       if (e.code == 'user-not-found') {
@@ -62,7 +66,10 @@ class AuthProvider extends ChangeNotifier {
         name: name,
         email: email,
       ));
+      await AuthConstants.user!.updateDisplayName(name);
+      await AuthConstants.user!.updateEmail(email);
       toggleLoading();
+      navigateTo(context, VerifyEmail());
     } on FirebaseException catch (e) {
       toggleLoading();
       if (e.code == 'user-not-found') {

@@ -1,16 +1,11 @@
 import 'dart:developer';
 
+import 'package:cloud_vault/utils/navigations.dart';
+import 'package:cloud_vault/views/screens/file_upload.dart';
 import 'package:cloud_vault/views/widgets/file_type.dart' as k;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-
 import '../../utils/textstyle.dart';
-
-enum CustomfileType {
-  image,
-  audio,
-  video,
-}
 
 class FileTypesModalSheet extends StatefulWidget {
   const FileTypesModalSheet({super.key});
@@ -23,9 +18,20 @@ class _FileTypesModalSheetState extends State<FileTypesModalSheet> {
   FilePicker filePicker = FilePicker.platform;
 
   Future<void> pickFile(FileType fileType) async {
-    FilePickerResult? result = await filePicker.pickFiles(type: fileType);
+    FilePickerResult? result = await filePicker.pickFiles(
+      type: fileType,
+      allowMultiple: true,
+      allowedExtensions:
+          fileType == FileType.custom ? ['pdf', 'doc', 'docx'] : null,
+    );
     if (result != null) {
-      log(result.files.first.name);
+      // ignore: use_build_context_synchronously
+      navigateTo(
+          context,
+          FileUpload(
+            pickedFile: result,
+            fileType: fileType,
+          ));
     }
   }
 

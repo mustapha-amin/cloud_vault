@@ -32,10 +32,7 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => AuthProvider(),
         ),
-        StreamProvider.value(
-          value: DatabaseService().getUserInfo(),
-          initialData: CloudVaultUser(name: 'loading...', email: 'loading...'),
-        )
+        
       ],
       child: Sizer(
         builder: (context, _, __) {
