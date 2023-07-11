@@ -18,7 +18,7 @@ class FileContents extends StatefulWidget {
 
 class _FileContentsState extends State<FileContents> {
   late Future<ListResult> files;
-  late Future<String> imgUrls;
+  bool isGrid = true;
 
   @override
   void initState() {
@@ -33,52 +33,56 @@ class _FileContentsState extends State<FileContents> {
         title: Text(widget.title),
         centerTitle: true,
         actions: [
-          Icon(Icons.list),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  isGrid = !isGrid;
+                });
+              },
+              child: Icon(
+                isGrid ? Icons.list : Icons.grid_view,
+              ),
+            ),
+          ),
         ],
       ),
       body: FutureBuilder<ListResult>(
         future: files,
         builder: (context, snapshot) {
+          List<Reference> items = snapshot.data!.items;
           if (snapshot.hasData) {
-            return GridView.builder(
-              itemCount: snapshot.data!.items.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-              ),
-              itemBuilder: (context, index) {
-                final item = snapshot.data!.items[index];
-                return Container(
-                  height: 40.h,
-                  margin: const EdgeInsets.all(5),
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey[300]!,
-                          blurRadius: 0.3,
+            return isGrid
+                ? GridView.builder(
+                    itemCount: items.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                    ),
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      return GridFile(item: item);
+                    },
+                  )
+                : ListView.builder(
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: SizedBox(
+                          width: 12.w,
+                          child: NetworkImageLoader(
+                            imgHeight: 8.h,
+                            imageUrlFuture: items[index].getDownloadURL(),
+                          ),
                         ),
-                        BoxShadow(
-                          color: Colors.grey[300]!,
-                          blurRadius: 0.3,
-                        )
-                      ]),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: NetworkImageLoader(
-                          imageUrlFuture: item.getDownloadURL(),
+                        title: Text(
+                          items[index].name,
+                          style: kTextStyle(context: context, size: 12),
                         ),
-                      ),
-                      Text(
-                        item.name,
-                        style: kTextStyle(context: context, size: 10),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
+                      );
+                    },
+                  );
           }
           return const Center(child: CircularProgressIndicator());
         },
@@ -87,10 +91,54 @@ class _FileContentsState extends State<FileContents> {
   }
 }
 
+class GridFile extends StatelessWidget {
+  final Reference item;
+
+  const GridFile({
+    super.key,
+    required this.item,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40.h,
+      margin: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey[300]!,
+              blurRadius: 0.3,
+            ),
+            BoxShadow(
+              color: Colors.grey[300]!,
+              blurRadius: 0.3,
+            )
+          ]),
+      child: Column(
+        children: [
+          Expanded(
+            child: NetworkImageLoader(
+              imageUrlFuture: item.getDownloadURL(),
+            ),
+          ),
+          Text(
+            item.name,
+            style: kTextStyle(context: context, size: 10),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class NetworkImageLoader extends StatelessWidget {
+  double? imgHeight;
   final Future<String> imageUrlFuture;
 
-  NetworkImageLoader({required this.imageUrlFuture});
+  NetworkImageLoader({required this.imageUrlFuture, this.imgHeight});
 
   @override
   Widget build(BuildContext context) {
@@ -101,8 +149,7 @@ class NetworkImageLoader extends StatelessWidget {
           final imageUrl = snapshot.data!;
           return Image.network(
             imageUrl,
-            height: 20.h,
-            width: 50.w,
+            height: imgHeight ?? 20.h,
           );
         } else if (snapshot.hasError) {
           return const Center(child: Text("Error loading image"));
