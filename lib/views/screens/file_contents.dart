@@ -1,4 +1,5 @@
 import 'package:cloud_vault/providers/files_provider.dart';
+import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/services/files_display_prefs.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
 import 'package:cloud_vault/views/widgets/loading_widget.dart';
@@ -62,35 +63,51 @@ class _FileContentsState extends State<FileContents> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
               child: filesProvider.isLoading
                   ? const LoadingWidget()
-                  : isGrid!
-                      ? GridView.builder(
-                          itemCount: widget.cloudVaultFiles!.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
+                  : widget.cloudVaultFiles!.isEmpty
+                      ? Center(
+                          child: Text(
+                            "You have'nt uploaded any files yet",
+                            style: kTextStyle(context: context, size: 14),
                           ),
-                          itemBuilder: (context, index) {
-                            final cloudVaultFile =
-                                widget.cloudVaultFiles![index];
-                            return GridFile(cloudVaultFile: cloudVaultFile);
-                          },
                         )
-                      : ListView.builder(
-                          itemCount: widget.cloudVaultFiles!.length,
-                          itemBuilder: (context, index) {
-                            final cloudVaultFile =
-                                widget.cloudVaultFiles![index];
-                            return ListTile(
-                              leading: SizedBox(
-                                  width: 12.w,
-                                  child: Image.network(cloudVaultFile.url!)),
-                              title: Text(
-                                cloudVaultFile.file!.name,
-                                style: kTextStyle(context: context, size: 12),
+                      : isGrid!
+                          ? GridView.builder(
+                              itemCount: widget.cloudVaultFiles!.length,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
                               ),
-                            );
-                          },
-                        ),
+                              itemBuilder: (context, index) {
+                                final cloudVaultFile =
+                                    widget.cloudVaultFiles![index];
+                                return GridFile(cloudVaultFile: cloudVaultFile);
+                              },
+                            )
+                          : ListView.builder(
+                              itemCount: widget.cloudVaultFiles!.length,
+                              itemBuilder: (context, index) {
+                                final cloudVaultFile =
+                                    widget.cloudVaultFiles![index];
+                                return ListTile(
+                                  leading: SizedBox(
+                                      width: 12.w,
+                                      height: 12.w,
+                                      child:
+                                          Image.network(cloudVaultFile.url!)),
+                                  title: Text(
+                                    cloudVaultFile.file!.name,
+                                    style:
+                                        kTextStyle(context: context, size: 12),
+                                  ),
+                                  trailing: Icon(
+                                    Icons.more_vert_rounded,
+                                    color: context.watch<ThemeProvider>().isDark
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                );
+                              },
+                            ),
             ),
           );
   }
@@ -106,32 +123,56 @@ class GridFile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 40.h,
-      margin: const EdgeInsets.all(5),
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey[300]!,
-            blurRadius: 0.3,
+    return Stack(
+      children: [
+        Container(
+          height: 40.h,
+          margin: const EdgeInsets.all(5),
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey[300]!,
+                blurRadius: 0.3,
+              ),
+              BoxShadow(
+                color: Colors.grey[300]!,
+                blurRadius: 0.3,
+              )
+            ],
           ),
-          BoxShadow(
-            color: Colors.grey[300]!,
-            blurRadius: 0.3,
-          )
-        ],
-      ),
-      child: Column(
-        children: [
-          Expanded(child: Image.network(cloudVaultFile.url!)),
-          Text(
-            cloudVaultFile.file!.name,
-            style: kTextStyle(context: context, size: 10),
+          child: Column(
+            children: [
+              Expanded(
+                  child: Image.network(
+                cloudVaultFile.url!,
+                fit: BoxFit.cover,
+              )),
+              Text(
+                cloudVaultFile.file!.name,
+                style: kTextStyle(context: context, size: 10),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        Positioned(
+          top: 2,
+          right: 2,
+          child: PopupMenuButton(
+            icon: Icon(
+              Icons.more_vert_rounded,
+              color: context.watch<ThemeProvider>().isDark
+                  ? Colors.white
+                  : Colors.black,
+            ),
+            itemBuilder: (context) {
+              return [];
+            },
+          ),
+        )
+      ],
     );
   }
 }

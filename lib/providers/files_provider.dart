@@ -1,3 +1,4 @@
+
 import 'package:cloud_vault/models/cloudvaultfile.dart';
 import 'package:cloud_vault/services/database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -13,44 +14,36 @@ class FileProvider extends ChangeNotifier {
 
   void startLoading() {
     isLoading = true;
+    notifyListeners();
   }
 
-  void stoploading() {
+  void stopLoading() {
     isLoading = false;
+    notifyListeners();
   }
 
-  toggleNewFileUploaded() {
+  void toggleNewFileUploaded() {
     newFileUploaded = !newFileUploaded;
     notifyListeners();
   }
 
-  void loadFiles(List<CLoudVaultFile> cloudFile, String? fileType) async {
-    if (cloudFile.isEmpty) {
+  Future<void> loadFiles(List<CLoudVaultFile> fileList, String? fileType) async {
+    if (fileList.isEmpty || newFileUploaded) {
       startLoading();
-      notifyListeners();
+
       final data = await DatabaseService().getFiles(fileType);
-      // ignore: avoid_function_literals_in_foreach_calls
-      data.forEach((file) async => cloudFile.add(CLoudVaultFile(
-            file: file,
-            url: await file.getDownloadURL(),
-          )));
+      final urls = await Future.wait(data.map((file) => file.getDownloadURL()));
 
-      stoploading();
-      notifyListeners();
-    } else {
-      if (newFileUploaded) {
-        final data = await DatabaseService().getFiles(fileType);
-        // ignore: avoid_function_literals_in_foreach_calls
-        data.forEach(
-            (file) async => cloudFile.any((element) => element.file == file)
-                ? null
-                : cloudFile.add(CLoudVaultFile(
-                    file: file,
-                    url: await file.getDownloadURL(),
-                  )));
+      final newFiles = data.map((file) {
+        final url = urls[data.indexOf(file)];
+        return CLoudVaultFile(file: file, url: url);
+      }).toList();
 
-        toggleNewFileUploaded();
-      }
+      fileList.clear();
+      fileList.addAll(newFiles);
+
+      stopLoading();
+      toggleNewFileUploaded();
     }
   }
 }
