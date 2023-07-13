@@ -39,7 +39,12 @@ class _FileUploadState extends State<FileUpload> {
     });
 
     for (var file in widget.pickedFile.files) {
-      await DatabaseService().uploadFile(context, file, widget.fileType.name);
+      await DatabaseService().uploadFile(
+          context,
+          file,
+          widget.fileType == FileType.custom
+              ? "document"
+              : widget.fileType.name);
     }
     setState(() {
       isLoading = !isLoading;
