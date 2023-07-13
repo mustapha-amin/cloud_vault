@@ -1,9 +1,13 @@
 import 'dart:io';
 
+import 'package:cloud_vault/providers/files_provider.dart';
+import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/services/database.dart';
 import 'package:cloud_vault/utils/extensions.dart';
+import 'package:cloud_vault/utils/textstyle.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class FileUpload extends StatefulWidget {
@@ -33,21 +37,24 @@ class _FileUploadState extends State<FileUpload> {
     setState(() {
       isLoading = !isLoading;
     });
+
     for (var file in widget.pickedFile.files) {
       await DatabaseService().uploadFile(context, file, widget.fileType.name);
     }
     setState(() {
       isLoading = !isLoading;
     });
-    
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     List<PlatformFile> files = widget.pickedFile.files;
+    var fileProvider = Provider.of<FileProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("File detail"),
+        title: const Text("Upload files"),
         centerTitle: true,
       ),
       body: Padding(
@@ -80,12 +87,22 @@ class _FileUploadState extends State<FileUpload> {
                 ],
               ),
             ),
-            Text("Name: ${selectedFile!.name}"),
-            Text("Size: ${selectedFile!.size.formatFileSize}"),
-            Text("File format: ${selectedFile!.extension}"),
+            Text(
+              "Name: ${selectedFile!.name}",
+              style: kTextStyle(context: context, size: 13),
+            ),
+            Text(
+              "Size: ${selectedFile!.size.formatFileSize}",
+              style: kTextStyle(context: context, size: 13),
+            ),
+            Text(
+              "File format: ${selectedFile!.extension}",
+              style: kTextStyle(context: context, size: 13),
+            ),
             FilledButton.icon(
               onPressed: () {
                 upLoad();
+                fileProvider.toggleNewFileUploaded();
               },
               icon: isLoading
                   ? const SizedBox(
@@ -118,15 +135,20 @@ class FileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 5),
       width: 25.w,
       height: 25.w,
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
         border: isSelected
             ? Border.all(
-                width: 0.7,
+                width: 3,
                 color: Theme.of(context).primaryColor,
               )
-            : null,
+            : Border.all(
+                width: 0.2,
+                color: Colors.grey[300]!,
+              ),
       ),
       child: Icon(
         fileType == FileType.image
@@ -136,6 +158,8 @@ class FileWidget extends StatelessWidget {
                 : fileType == FileType.audio
                     ? Icons.audio_file
                     : Icons.file_copy,
+        color:
+            context.watch<ThemeProvider>().isDark ? Colors.grey : Colors.black,
       ),
     );
   }

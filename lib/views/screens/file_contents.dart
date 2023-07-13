@@ -1,102 +1,107 @@
-import 'dart:developer';
-
-import 'package:cloud_vault/services/database.dart';
+import 'package:cloud_vault/providers/files_provider.dart';
+import 'package:cloud_vault/services/files_display_prefs.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_vault/views/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_vault/models/cloudvaultfile.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class FileContents extends StatefulWidget {
   final String title;
   final IconData iconData;
-  const FileContents({required this.title, required this.iconData, super.key});
+  List<CLoudVaultFile>? cloudVaultFiles;
+
+  FileContents({
+    required this.title,
+    required this.iconData,
+    this.cloudVaultFiles,
+    super.key,
+  });
 
   @override
   State<FileContents> createState() => _FileContentsState();
 }
 
 class _FileContentsState extends State<FileContents> {
-  late Future<ListResult> files;
-  bool isGrid = true;
+  bool? isGrid;
 
   @override
   void initState() {
-    files = DatabaseService().getFiles(widget.title);
+    isGrid = FileDisplayPreference.isGrid();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  isGrid = !isGrid;
-                });
-              },
-              child: Icon(
-                isGrid ? Icons.list : Icons.grid_view,
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: FutureBuilder<ListResult>(
-        future: files,
-        builder: (context, snapshot) {
-          List<Reference> items = snapshot.data!.items;
-          if (snapshot.hasData) {
-            return isGrid
-                ? GridView.builder(
-                    itemCount: items.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
+    var filesProvider = Provider.of<FileProvider>(context);
+    return filesProvider.isLoading
+        ? const LoadingWidget()
+        : Scaffold(
+            appBar: AppBar(
+              title: Text(widget.title),
+              centerTitle: true,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        isGrid = !isGrid!;
+                      });
+                      FileDisplayPreference.toggle(isGrid!);
+                    },
+                    child: Icon(
+                      isGrid! ? Icons.list : Icons.grid_view,
                     ),
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      return GridFile(item: item);
-                    },
-                  )
-                : ListView.builder(
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: SizedBox(
-                          width: 12.w,
-                          child: NetworkImageLoader(
-                            imgHeight: 8.h,
-                            imageUrlFuture: items[index].getDownloadURL(),
+                  ),
+                ),
+              ],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+              child: filesProvider.isLoading
+                  ? const LoadingWidget()
+                  : isGrid!
+                      ? GridView.builder(
+                          itemCount: widget.cloudVaultFiles!.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
                           ),
+                          itemBuilder: (context, index) {
+                            final cloudVaultFile =
+                                widget.cloudVaultFiles![index];
+                            return GridFile(cloudVaultFile: cloudVaultFile);
+                          },
+                        )
+                      : ListView.builder(
+                          itemCount: widget.cloudVaultFiles!.length,
+                          itemBuilder: (context, index) {
+                            final cloudVaultFile =
+                                widget.cloudVaultFiles![index];
+                            return ListTile(
+                              leading: SizedBox(
+                                  width: 12.w,
+                                  child: Image.network(cloudVaultFile.url!)),
+                              title: Text(
+                                cloudVaultFile.file!.name,
+                                style: kTextStyle(context: context, size: 12),
+                              ),
+                            );
+                          },
                         ),
-                        title: Text(
-                          items[index].name,
-                          style: kTextStyle(context: context, size: 12),
-                        ),
-                      );
-                    },
-                  );
-          }
-          return const Center(child: CircularProgressIndicator());
-        },
-      ),
-    );
+            ),
+          );
   }
 }
 
 class GridFile extends StatelessWidget {
-  final Reference item;
+  final CLoudVaultFile cloudVaultFile;
 
   const GridFile({
     super.key,
-    required this.item,
+    required this.cloudVaultFile,
   });
 
   @override
@@ -106,56 +111,27 @@ class GridFile extends StatelessWidget {
       margin: const EdgeInsets.all(5),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey[300]!,
-              blurRadius: 0.3,
-            ),
-            BoxShadow(
-              color: Colors.grey[300]!,
-              blurRadius: 0.3,
-            )
-          ]),
+        color: Theme.of(context).scaffoldBackgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!,
+            blurRadius: 0.3,
+          ),
+          BoxShadow(
+            color: Colors.grey[300]!,
+            blurRadius: 0.3,
+          )
+        ],
+      ),
       child: Column(
         children: [
-          Expanded(
-            child: NetworkImageLoader(
-              imageUrlFuture: item.getDownloadURL(),
-            ),
-          ),
+          Expanded(child: Image.network(cloudVaultFile.url!)),
           Text(
-            item.name,
+            cloudVaultFile.file!.name,
             style: kTextStyle(context: context, size: 10),
           ),
         ],
       ),
-    );
-  }
-}
-
-class NetworkImageLoader extends StatelessWidget {
-  double? imgHeight;
-  final Future<String> imageUrlFuture;
-
-  NetworkImageLoader({required this.imageUrlFuture, this.imgHeight});
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-      future: imageUrlFuture,
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-        if (snapshot.hasData) {
-          final imageUrl = snapshot.data!;
-          return Image.network(
-            imageUrl,
-            height: imgHeight ?? 20.h,
-          );
-        } else if (snapshot.hasError) {
-          return const Center(child: Text("Error loading image"));
-        }
-        return const Center(child: CircularProgressIndicator());
-      },
     );
   }
 }

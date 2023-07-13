@@ -47,10 +47,10 @@ class DatabaseService {
     }
   }
 
-  Future<ListResult> getFiles(String? fileType) async {
+  Future<List<Reference>> getFiles(String? fileType) async {
     final path = '/${AuthConstants.userId}/$fileType';
     log(path);
     ListResult result = await firebaseStorage.ref(path).listAll();
-    return result;
+    return result.items;
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cloud_vault/providers/files_provider.dart';
 import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/utils/auth_constants.dart';
 import 'package:cloud_vault/utils/spacings.dart';
@@ -19,6 +20,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var theme = Provider.of<ThemeProvider>(context);
+    var fileProvider = Provider.of<FileProvider>(context);
     return Scaffold(
       drawer: const HomeDrawer(),
       appBar: AppBar(
@@ -34,10 +36,26 @@ class Home extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 10),
         child: ListView(
           children: [
-            const FileTile(iconData: Icons.image, title: "Images"),
-            const FileTile(iconData: Icons.video_collection, title: "Videos"),
-            const FileTile(iconData: Icons.audio_file, title: "Audios"),
-            const FileTile(iconData: Icons.file_copy, title: "Documents"),
+            FileTile(
+              iconData: Icons.image,
+              title: "Images",
+              cloudVaultFiles: fileProvider.images,
+            ),
+            FileTile(
+              iconData: Icons.video_collection,
+              title: "Videos",
+              cloudVaultFiles: fileProvider.videos,
+            ),
+            FileTile(
+              iconData: Icons.audio_file,
+              title: "Audios",
+              cloudVaultFiles: fileProvider.audios,
+            ),
+            FileTile(
+              iconData: Icons.file_copy,
+              title: "Documents",
+              cloudVaultFiles: fileProvider.documents,
+            ),
             addVerticalSpacing(10.h),
             const StorageInfo()
           ],
