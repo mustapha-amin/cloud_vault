@@ -7,6 +7,7 @@ import 'package:cloud_vault/utils/textstyle.dart';
 import 'package:cloud_vault/views/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_vault/models/cloudvaultfile.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -42,7 +43,7 @@ class _FileContentsState extends State<FileContents> {
     var filesProvider = Provider.of<FileProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title.capitalizeFirst),
+        title: Text(widget.title.capitalizeFirst).animate(),
         centerTitle: true,
         actions: [
           Padding(
@@ -161,7 +162,9 @@ class ListFile extends StatelessWidget {
               ),
               addHorizontalSpacing(10),
               Text(
-                cloudVaultFile.file!.name,
+                cloudVaultFile.file!.name.length < 30
+                    ? cloudVaultFile.file!.name
+                    : '${cloudVaultFile.file!.name.substring(0, 29)}...',
                 style: kTextStyle(context: context, size: 12),
               ),
             ],
