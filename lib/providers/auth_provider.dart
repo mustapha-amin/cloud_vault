@@ -31,7 +31,8 @@ class AuthProvider extends ChangeNotifier {
         password: password!,
       );
       toggleLoading();
-      navigateTo(context, Home());
+      // ignore: use_build_context_synchronously
+      navigateTo(context, const Home());
     } on FirebaseException catch (e) {
       toggleLoading();
       if (e.code == 'user-not-found') {
@@ -44,10 +45,9 @@ class AuthProvider extends ChangeNotifier {
         error = "A network occured, check your internet settings";
         showErrorDialog(context, error);
       } else {
-        error = e.message.toString();
-        showErrorDialog(context, error);
+        showErrorDialog(context, "An error occured");
       }
-    } finally {}
+    }
   }
 
   Future<void> signUp(
@@ -69,7 +69,7 @@ class AuthProvider extends ChangeNotifier {
       await AuthConstants.user!.updateDisplayName(name);
       await AuthConstants.user!.updateEmail(email);
       toggleLoading();
-      navigateTo(context, VerifyEmail());
+      navigateTo(context, const VerifyEmail());
     } on FirebaseException catch (e) {
       toggleLoading();
       if (e.code == 'user-not-found') {

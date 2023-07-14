@@ -24,6 +24,7 @@ class _FileTypesModalSheetState extends State<FileTypesModalSheet> {
       allowedExtensions:
           fileType == FileType.custom ? ['pdf', 'doc', 'docx'] : null,
     );
+
     if (result != null) {
       // ignore: use_build_context_synchronously
       navigateTo(

@@ -2,8 +2,10 @@ import 'package:cloud_vault/providers/files_provider.dart';
 import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/services/files_display_prefs.dart';
 import 'package:cloud_vault/utils/extensions.dart';
+import 'package:cloud_vault/utils/navigations.dart';
 import 'package:cloud_vault/utils/spacings.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
+import 'package:cloud_vault/views/screens/full_screen_image.dart';
 import 'package:cloud_vault/views/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_vault/models/cloudvaultfile.dart';
@@ -85,14 +87,27 @@ class _FileContentsState extends State<FileContents> {
                               itemBuilder: (context, index) {
                                 final cloudVaultFile =
                                     widget.cloudVaultFiles![index];
-                                return GridFile(
-                                  cloudVaultFile: cloudVaultFile,
-                                  fileType: widget.title,
-                                  extension: widget.title == 'documents'
-                                      ? cloudVaultFile.file!.name
-                                          .split('.')
-                                          .last
-                                      : null,
+                                return GestureDetector(
+                                  onTap: () {
+                                    navigateTo(
+                                        context,
+                                        switch (widget.title) {
+                                          'images' => FullScreenImage(
+                                              file: widget.cloudVaultFiles!,
+                                              index: index,
+                                            ),
+                                          _ => Container(),
+                                        });
+                                  },
+                                  child: GridFile(
+                                    cloudVaultFile: cloudVaultFile,
+                                    fileType: widget.title,
+                                    extension: widget.title == 'documents'
+                                        ? cloudVaultFile.file!.name
+                                            .split('.')
+                                            .last
+                                        : null,
+                                  ),
                                 );
                               },
                             )
