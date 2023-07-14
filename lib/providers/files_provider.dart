@@ -1,4 +1,3 @@
-
 import 'package:cloud_vault/models/cloudvaultfile.dart';
 import 'package:cloud_vault/services/database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -27,7 +26,8 @@ class FileProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loadFiles(List<CLoudVaultFile> fileList, String? fileType) async {
+  Future<void> loadFiles(
+      List<CLoudVaultFile> fileList, String? fileType) async {
     if (fileList.isEmpty || newFileUploaded) {
       startLoading();
 
@@ -43,7 +43,16 @@ class FileProvider extends ChangeNotifier {
       fileList.addAll(newFiles);
 
       stopLoading();
+      
       toggleNewFileUploaded();
     }
+  }
+
+  Future<void> deleteFile(
+      String? fileType, String? fileName, List<CLoudVaultFile> fileList) async {
+    startLoading();
+    await DatabaseService().deleteFile(fileType, fileName);
+    fileList.removeWhere((item) => item.file!.name == fileName);
+    stopLoading();
   }
 }

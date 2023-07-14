@@ -5,6 +5,7 @@ import 'package:cloud_vault/utils/extensions.dart';
 import 'package:cloud_vault/utils/navigations.dart';
 import 'package:cloud_vault/utils/spacings.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
+import 'package:cloud_vault/views/screens/document_view.dart';
 import 'package:cloud_vault/views/screens/full_screen_image.dart';
 import 'package:cloud_vault/views/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,7 @@ import 'package:cloud_vault/models/cloudvaultfile.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-
+import 'package:video_player/video_player.dart';
 import '../widgets/grid_file.dart';
 
 class FileContents extends StatefulWidget {
@@ -96,6 +97,9 @@ class _FileContentsState extends State<FileContents> {
                                               file: widget.cloudVaultFiles!,
                                               index: index,
                                             ),
+                                          'documents' => DocumentView(
+                                              url: cloudVaultFile.url,
+                                            ),
                                           _ => Container(),
                                         });
                                   },
@@ -116,14 +120,30 @@ class _FileContentsState extends State<FileContents> {
                               itemBuilder: (context, index) {
                                 final cloudVaultFile =
                                     widget.cloudVaultFiles![index];
-                                return ListFile(
-                                  cloudVaultFile: cloudVaultFile,
-                                  fileType: widget.title,
-                                  extension: widget.title == 'documents'
-                                      ? cloudVaultFile.file!.name
-                                          .split('.')
-                                          .last
-                                      : null,
+                                return GestureDetector(
+                                  onTap: () {
+                                    navigateTo(
+                                        context,
+                                        switch (widget.title) {
+                                          'images' => FullScreenImage(
+                                              file: widget.cloudVaultFiles!,
+                                              index: index,
+                                            ),
+                                          'documents' => DocumentView(
+                                              url: cloudVaultFile.url,
+                                            ),
+                                          _ => Container(),
+                                        });
+                                  },
+                                  child: ListFile(
+                                    cloudVaultFile: cloudVaultFile,
+                                    fileType: widget.title,
+                                    extension: widget.title == 'documents'
+                                        ? cloudVaultFile.file!.name
+                                            .split('.')
+                                            .last
+                                        : null,
+                                  ),
                                 );
                               },
                             ),

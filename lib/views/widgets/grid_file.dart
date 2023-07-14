@@ -25,6 +25,7 @@ class GridFile extends StatelessWidget {
       children: [
         Container(
           height: 40.h,
+          width: 50.w,
           margin: const EdgeInsets.all(5),
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(

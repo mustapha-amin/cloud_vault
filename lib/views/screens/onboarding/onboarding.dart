@@ -51,8 +51,8 @@ class Onboarding extends StatelessWidget {
                   backgroundColor: Theme.of(context).primaryColor,
                 ),
                 onPressed: () {
-                  OnboardingPreference.savePref(false);
                   replaceScreen(context, const Authenticate());
+                  OnboardingPreference.savePref(false);
                 },
                 child: Text(
                   "Get started",

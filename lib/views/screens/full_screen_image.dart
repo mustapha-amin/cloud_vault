@@ -1,6 +1,10 @@
 import 'package:cloud_vault/models/cloudvaultfile.dart';
+import 'package:cloud_vault/providers/files_provider.dart';
+import 'package:cloud_vault/utils/spacings.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class FullScreenImage extends StatefulWidget {
@@ -13,46 +17,115 @@ class FullScreenImage extends StatefulWidget {
 }
 
 class _FullScreenImageState extends State<FullScreenImage> {
-  int? currentIndex;
+  late int currentIndex;
+  PageController? pageController;
 
   @override
   void initState() {
-    currentIndex = widget.index;
+    currentIndex = widget.index!;
+    pageController = PageController(initialPage: currentIndex);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    var fileProvider = Provider.of<FileProvider>(context);
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
         backgroundColor: Colors.black,
         title: Text(
-          widget.file[currentIndex!].file!.name,
+          widget.file[currentIndex].file!.name,
           style: kTextStyle(context: context, size: 13, color: Colors.white),
         ),
       ),
-      body: PageView.builder(
-        onPageChanged: (newIndex) => setState(() => currentIndex = newIndex),
-        itemCount: widget.file.length,
-        itemBuilder: (context, index) {
-          return Container(
-            decoration: const BoxDecoration(
-              color: Colors.black,
-            ),
-            child: Center(
-              child: SizedBox(
-                height: 60.h,
-                width: 100.w,
-                child: Image.network(
-                  widget.file[currentIndex!].url!,
-                  fit: BoxFit.cover,
-                  filterQuality: FilterQuality.high,
+      body: Column(
+        children: [
+          Expanded(
+            child: PageView(
+              onPageChanged: (newIndex) {
+                setState(() {
+                  currentIndex = newIndex;
+                });
+              },
+              controller: pageController,
+              scrollDirection: Axis.horizontal,
+              physics: const ClampingScrollPhysics(),
+              children: [
+                ...widget.file.map(
+                  (e) => Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.black,
+                    ),
+                    child: Center(
+                      child: Image.network(
+                        e.url!,
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.medium,
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            )
+          ),
+          Container(
+            color: Colors.black,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.share,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
+                addHorizontalSpacing(20),
+                IconButton(
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Delete'),
+                              content:
+                                  const Text("Do you wan to delete this image"),
+                              actions: [
+                                TextButton(
+                                    onPressed: () {
+                                      fileProvider.deleteFile(
+                                        'images',
+                                        widget.file[currentIndex].file!.name,
+                                        widget.file,
+                                      );
+                                      Navigator.of(context).pop();
+                                      if (currentIndex > 0) {
+                                        currentIndex--;
+                                        if (widget.file.isEmpty) {
+                                          Navigator.pop(context);
+                                          return;
+                                        }
+                                      }
+                                    },
+                                    child: const Text("Yes")),
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text("No"))
+                              ],
+                            );
+                          });
+                    },
+                    icon: const Icon(
+                      Icons.delete,
+                      color: Colors.white,
+                    ))
+              ],
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

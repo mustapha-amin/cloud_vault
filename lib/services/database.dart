@@ -33,11 +33,6 @@ class DatabaseService {
       final ref = firebaseStorage.ref().child(path);
       await ref.putFile(File(file.path!));
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Uploaded successfully"),
-        margin: EdgeInsets.all(6),
-        behavior: SnackBarBehavior.floating,
-      ));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Uploaded successfully"),
@@ -52,5 +47,10 @@ class DatabaseService {
     log(path);
     ListResult result = await firebaseStorage.ref(path).listAll();
     return result.items;
+  }
+
+  Future<void> deleteFile(String? fileType, String? fileName) async {
+    final path = '/${AuthConstants.userId}/$fileType/$fileName';
+    await firebaseStorage.ref(path).delete();
   }
 }

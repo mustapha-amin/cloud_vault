@@ -33,7 +33,7 @@ class _FileUploadState extends State<FileUpload> {
     super.initState();
   }
 
-  void upLoad() async {
+  void upLoad(BuildContext context) async {
     setState(() {
       isLoading = !isLoading;
     });
@@ -49,6 +49,14 @@ class _FileUploadState extends State<FileUpload> {
     setState(() {
       isLoading = !isLoading;
     });
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text("Uploaded successfully"),
+      margin: EdgeInsets.all(6),
+      duration: Duration(milliseconds: 900),
+      behavior: SnackBarBehavior.floating,
+    ));
+    await Future.delayed(const Duration(milliseconds: 900));
+    ScaffoldMessenger.of(context).clearSnackBars();
     // ignore: use_build_context_synchronously
     Navigator.pop(context);
   }
@@ -106,7 +114,8 @@ class _FileUploadState extends State<FileUpload> {
             ),
             FilledButton.icon(
               onPressed: () {
-                upLoad();
+                upLoad(context);
+
                 fileProvider.toggleNewFileUploaded();
               },
               icon: isLoading
@@ -152,7 +161,9 @@ class FileWidget extends StatelessWidget {
               )
             : Border.all(
                 width: 0.2,
-                color: Colors.grey[300]!,
+                color: context.watch<ThemeProvider>().isDark
+                    ? Colors.grey[300]!
+                    : Colors.grey[800]!,
               ),
       ),
       child: Icon(
