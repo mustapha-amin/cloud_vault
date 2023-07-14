@@ -42,33 +42,32 @@ class _FullScreenImageState extends State<FullScreenImage> {
       body: Column(
         children: [
           Expanded(
-            child: PageView(
-              onPageChanged: (newIndex) {
-                setState(() {
-                  currentIndex = newIndex;
-                });
-              },
-              controller: pageController,
-              scrollDirection: Axis.horizontal,
-              physics: const ClampingScrollPhysics(),
-              children: [
-                ...widget.file.map(
-                  (e) => Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.black,
-                    ),
-                    child: Center(
-                      child: Image.network(
-                        e.url!,
-                        fit: BoxFit.cover,
-                        filterQuality: FilterQuality.medium,
-                      ),
+              child: PageView(
+            onPageChanged: (newIndex) {
+              setState(() {
+                currentIndex = newIndex;
+              });
+            },
+            controller: pageController,
+            scrollDirection: Axis.horizontal,
+            physics: const ClampingScrollPhysics(),
+            children: [
+              ...widget.file.map(
+                (e) => Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.black,
+                  ),
+                  child: Center(
+                    child: Image.network(
+                      e.url!,
+                      fit: BoxFit.cover,
+                      filterQuality: FilterQuality.medium,
                     ),
                   ),
-                )
-              ],
-            )
-          ),
+                ),
+              )
+            ],
+          )),
           Container(
             color: Colors.black,
             child: Row(
@@ -100,12 +99,12 @@ class _FullScreenImageState extends State<FullScreenImage> {
                                         widget.file,
                                       );
                                       Navigator.of(context).pop();
+                                      if (widget.file.isEmpty) {
+                                        Navigator.pop(context);
+                                        return;
+                                      }
                                       if (currentIndex > 0) {
                                         currentIndex--;
-                                        if (widget.file.isEmpty) {
-                                          Navigator.pop(context);
-                                          return;
-                                        }
                                       }
                                     },
                                     child: const Text("Yes")),

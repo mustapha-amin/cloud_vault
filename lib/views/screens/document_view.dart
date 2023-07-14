@@ -14,7 +14,8 @@ class _DocumentViewState extends State<DocumentView> {
 
   @override
   void initState() {
-    controller = WebViewController()..loadRequest(Uri.parse(widget.url!));
+    controller = WebViewController()
+      ..loadRequest(Uri.parse('https://flutter.dev'));
     super.initState();
   }
 

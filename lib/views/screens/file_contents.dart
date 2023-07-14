@@ -5,14 +5,15 @@ import 'package:cloud_vault/utils/extensions.dart';
 import 'package:cloud_vault/utils/navigations.dart';
 import 'package:cloud_vault/utils/spacings.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
-import 'package:cloud_vault/views/screens/document_view.dart';
 import 'package:cloud_vault/views/screens/full_screen_image.dart';
+import 'package:cloud_vault/views/screens/video_view.dart';
 import 'package:cloud_vault/views/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_vault/models/cloudvaultfile.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import '../widgets/grid_file.dart';
 
@@ -90,18 +91,21 @@ class _FileContentsState extends State<FileContents> {
                                     widget.cloudVaultFiles![index];
                                 return GestureDetector(
                                   onTap: () {
-                                    navigateTo(
-                                        context,
-                                        switch (widget.title) {
-                                          'images' => FullScreenImage(
-                                              file: widget.cloudVaultFiles!,
-                                              index: index,
-                                            ),
-                                          'documents' => DocumentView(
-                                              url: cloudVaultFile.url,
-                                            ),
-                                          _ => Container(),
-                                        });
+                                    widget.title == 'documents'
+                                        ? launchUrl(
+                                            Uri.parse(cloudVaultFile.url!))
+                                        : navigateTo(
+                                            context,
+                                            switch (widget.title) {
+                                              'images' => FullScreenImage(
+                                                  file: widget.cloudVaultFiles!,
+                                                  index: index,
+                                                ),
+                                              'videos' => VideoPlayerScreen(
+                                                  url: cloudVaultFile.url,
+                                                ),
+                                              _ => Container(),
+                                            });
                                   },
                                   child: GridFile(
                                     cloudVaultFile: cloudVaultFile,
@@ -122,18 +126,19 @@ class _FileContentsState extends State<FileContents> {
                                     widget.cloudVaultFiles![index];
                                 return GestureDetector(
                                   onTap: () {
-                                    navigateTo(
-                                        context,
-                                        switch (widget.title) {
-                                          'images' => FullScreenImage(
-                                              file: widget.cloudVaultFiles!,
-                                              index: index,
-                                            ),
-                                          'documents' => DocumentView(
-                                              url: cloudVaultFile.url,
-                                            ),
-                                          _ => Container(),
-                                        });
+                                    widget.title == 'documents'
+                                        ? launchUrl(
+                                            Uri.parse(cloudVaultFile.url!))
+                                        : navigateTo(
+                                            context,
+                                            switch (widget.title) {
+                                              'images' => FullScreenImage(
+                                                  file: widget.cloudVaultFiles!,
+                                                  index: index,
+                                                ),
+                                              'videos' => VideoPlayerScreen(),
+                                              _ => Container(),
+                                            });
                                   },
                                   child: ListFile(
                                     cloudVaultFile: cloudVaultFile,
