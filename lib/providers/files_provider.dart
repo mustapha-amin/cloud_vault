@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:cloud_vault/models/cloudvaultfile.dart';
 import 'package:cloud_vault/services/database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -5,7 +6,10 @@ import 'package:flutter/material.dart';
 
 class FileProvider extends ChangeNotifier {
   bool isLoading = false;
-  bool newFileUploaded = false;
+  bool newImageUploaded = false;
+  bool newVideoUploaded = false;
+  bool newaudioUploaded = false;
+  bool newdocumentUploaded = false;
   List<CLoudVaultFile> images = [];
   List<CLoudVaultFile> videos = [];
   List<CLoudVaultFile> audios = [];
@@ -21,18 +25,20 @@ class FileProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleNewFileUploaded() {
-    newFileUploaded = !newFileUploaded;
+  void toggleNewFileUploaded(bool val) {
+    val = !val;
     notifyListeners();
   }
 
-  Future<void> loadFiles(
-      List<CLoudVaultFile> fileList, String? fileType) async {
-    if (fileList.isEmpty || newFileUploaded) {
+  Future<void> loadFiles(List<CLoudVaultFile> fileList, String? fileType,
+      {bool? newFileupladed}) async {
+    if (fileList.isEmpty || newFileupladed!) {
       startLoading();
 
       final data = await DatabaseService().getFiles(fileType);
-      final urls = await Future.wait(data.map((file) => file.getDownloadURL()));
+      final urls = await Future.wait(
+          data.map((file) async => await file.getDownloadURL()));
+      urls.map((e) => log);
 
       final newFiles = data.map((file) {
         final url = urls[data.indexOf(file)];
@@ -43,8 +49,8 @@ class FileProvider extends ChangeNotifier {
       fileList.addAll(newFiles);
 
       stopLoading();
-      
-      toggleNewFileUploaded();
+
+      toggleNewFileUploaded(newFileupladed!);
     }
   }
 
@@ -54,5 +60,10 @@ class FileProvider extends ChangeNotifier {
     await DatabaseService().deleteFile(fileType, fileName);
     fileList.removeWhere((item) => item.file!.name == fileName);
     stopLoading();
+  }
+
+  void clearList(List<CLoudVaultFile> files) {
+    files.clear();
+    notifyListeners();
   }
 }

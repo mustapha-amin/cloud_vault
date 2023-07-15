@@ -28,6 +28,12 @@ class FileTile extends StatelessWidget {
         filesProvider.loadFiles(
           cloudVaultFiles,
           title.toLowerCase(),
+          newFileupladed: switch (title) {
+            'image' => filesProvider.newImageUploaded,
+            'videos' => filesProvider.newVideoUploaded,
+            'audios' => filesProvider.newaudioUploaded,
+            _ => filesProvider.newdocumentUploaded,
+          }
         );
         navigateTo(
           context,

@@ -42,12 +42,19 @@ class _FileContentsState extends State<FileContents> {
     super.initState();
   }
 
+  void loadPdf(String url) async {
+    await canLaunchUrl(Uri.parse(url))
+        ? await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication)
+        : null;
+  }
+
   @override
   Widget build(BuildContext context) {
     var filesProvider = Provider.of<FileProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title.capitalizeFirst).animate(),
+        title: Text(widget.title.capitalizeFirst),
         centerTitle: true,
         actions: [
           Padding(
@@ -68,90 +75,114 @@ class _FileContentsState extends State<FileContents> {
       ),
       body: filesProvider.isLoading
           ? const LoadingWidget()
-          : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-              child: filesProvider.isLoading
-                  ? const LoadingWidget()
-                  : widget.cloudVaultFiles!.isEmpty
-                      ? Center(
-                          child: Text(
-                            "You have'nt uploaded any files yet",
-                            style: kTextStyle(context: context, size: 14),
-                          ),
-                        )
-                      : isGrid!
-                          ? GridView.builder(
-                              itemCount: widget.cloudVaultFiles!.length,
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                              ),
-                              itemBuilder: (context, index) {
-                                final cloudVaultFile =
-                                    widget.cloudVaultFiles![index];
-                                return GestureDetector(
-                                  onTap: () {
-                                    widget.title == 'documents'
-                                        ? launchUrl(
-                                            Uri.parse(cloudVaultFile.url!))
-                                        : navigateTo(
-                                            context,
-                                            switch (widget.title) {
-                                              'images' => FullScreenImage(
-                                                  file: widget.cloudVaultFiles!,
-                                                  index: index,
-                                                ),
-                                              'videos' => VideoPlayerScreen(
-                                                  url: cloudVaultFile.url,
-                                                ),
-                                              _ => Container(),
-                                            });
-                                  },
-                                  child: GridFile(
-                                    cloudVaultFile: cloudVaultFile,
-                                    fileType: widget.title,
-                                    extension: widget.title == 'documents'
-                                        ? cloudVaultFile.file!.name
-                                            .split('.')
-                                            .last
-                                        : null,
-                                  ),
-                                );
-                              },
-                            )
-                          : ListView.builder(
-                              itemCount: widget.cloudVaultFiles!.length,
-                              itemBuilder: (context, index) {
-                                final cloudVaultFile =
-                                    widget.cloudVaultFiles![index];
-                                return GestureDetector(
-                                  onTap: () {
-                                    widget.title == 'documents'
-                                        ? launchUrl(
-                                            Uri.parse(cloudVaultFile.url!))
-                                        : navigateTo(
-                                            context,
-                                            switch (widget.title) {
-                                              'images' => FullScreenImage(
-                                                  file: widget.cloudVaultFiles!,
-                                                  index: index,
-                                                ),
-                                              'videos' => VideoPlayerScreen(),
-                                              _ => Container(),
-                                            });
-                                  },
-                                  child: ListFile(
-                                    cloudVaultFile: cloudVaultFile,
-                                    fileType: widget.title,
-                                    extension: widget.title == 'documents'
-                                        ? cloudVaultFile.file!.name
-                                            .split('.')
-                                            .last
-                                        : null,
-                                  ),
-                                );
-                              },
+          : RefreshIndicator(
+              onRefresh: () async => {
+                filesProvider.clearList(widget.cloudVaultFiles!),
+                filesProvider.toggleNewFileUploaded(
+                  switch (widget.title) {
+                    'images' => filesProvider.newImageUploaded,
+                    'videos' => filesProvider.newVideoUploaded,
+                    'audio' => filesProvider.newaudioUploaded,
+                    _ => filesProvider.newdocumentUploaded,
+                  },
+                ),
+                await filesProvider.loadFiles(
+                  widget.cloudVaultFiles!,
+                  widget.title,
+                  newFileupladed: switch (widget.title) {
+                    'images' => filesProvider.newImageUploaded,
+                    'videos' => filesProvider.newVideoUploaded,
+                    'audio' => filesProvider.newaudioUploaded,
+                    _ => filesProvider.newdocumentUploaded,
+                  },
+                )
+              },
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                child: filesProvider.isLoading
+                    ? const LoadingWidget()
+                    : widget.cloudVaultFiles!.isEmpty
+                        ? Center(
+                            child: Text(
+                              "You have'nt uploaded any files yet",
+                              style: kTextStyle(context: context, size: 14),
                             ),
+                          )
+                        : isGrid!
+                            ? GridView.builder(
+                                itemCount: widget.cloudVaultFiles!.length,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                ),
+                                itemBuilder: (context, index) {
+                                  final cloudVaultFile =
+                                      widget.cloudVaultFiles![index];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      widget.title == 'documents'
+                                          ? loadPdf(cloudVaultFile.url!)
+                                          : navigateTo(
+                                              context,
+                                              switch (widget.title) {
+                                                'images' => FullScreenImage(
+                                                    file:
+                                                        widget.cloudVaultFiles!,
+                                                    index: index,
+                                                  ),
+                                                'videos' => VideoPlayerScreen(
+                                                    url: cloudVaultFile.url,
+                                                  ),
+                                                _ => Container(),
+                                              });
+                                    },
+                                    child: GridFile(
+                                      cloudVaultFile: cloudVaultFile,
+                                      fileType: widget.title,
+                                      extension: widget.title == 'documents'
+                                          ? cloudVaultFile.file!.name
+                                              .split('.')
+                                              .last
+                                          : null,
+                                    ),
+                                  );
+                                },
+                              )
+                            : ListView.builder(
+                                itemCount: widget.cloudVaultFiles!.length,
+                                itemBuilder: (context, index) {
+                                  final cloudVaultFile =
+                                      widget.cloudVaultFiles![index];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      widget.title == 'documents'
+                                          ? loadPdf(cloudVaultFile.url!)
+                                          : navigateTo(
+                                              context,
+                                              switch (widget.title) {
+                                                'images' => FullScreenImage(
+                                                    file:
+                                                        widget.cloudVaultFiles!,
+                                                    index: index,
+                                                  ),
+                                                'videos' => VideoPlayerScreen(),
+                                                _ => Container(),
+                                              });
+                                    },
+                                    child: ListFile(
+                                      cloudVaultFile: cloudVaultFile,
+                                      fileType: widget.title,
+                                      extension: widget.title == 'documents'
+                                          ? cloudVaultFile.file!.name
+                                              .split('.')
+                                              .last
+                                          : null,
+                                    ),
+                                  );
+                                },
+                              ),
+              ),
             ),
     );
   }

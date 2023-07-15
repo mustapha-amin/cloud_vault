@@ -39,66 +39,71 @@ class _FullScreenImageState extends State<FullScreenImage> {
           style: kTextStyle(context: context, size: 13, color: Colors.white),
         ),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-              child: PageView(
-            onPageChanged: (newIndex) {
-              setState(() {
-                currentIndex = newIndex;
-              });
-            },
-            controller: pageController,
-            scrollDirection: Axis.horizontal,
-            physics: const ClampingScrollPhysics(),
+          Column(
             children: [
-              ...widget.file.map(
-                (e) => Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.black,
-                  ),
-                  child: Center(
-                    child: Image.network(
-                      e.url!,
-                      fit: BoxFit.cover,
-                      filterQuality: FilterQuality.medium,
+              Expanded(
+                  child: PageView(
+                onPageChanged: (newIndex) {
+                  setState(() {
+                    currentIndex = newIndex;
+                  });
+                },
+                controller: pageController,
+                scrollDirection: Axis.horizontal,
+                physics: fileProvider.isLoading
+                    ? const NeverScrollableScrollPhysics()
+                    : const ClampingScrollPhysics(),
+                children: [
+                  ...widget.file.map(
+                    (e) => Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.black,
+                      ),
+                      child: Center(
+                        child: Image.network(
+                          e.url!,
+                          fit: BoxFit.cover,
+                          filterQuality: FilterQuality.medium,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              )
-            ],
-          )),
-          Container(
-            color: Colors.black,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.share,
-                    color: Colors.white,
-                  ),
-                ),
-                addHorizontalSpacing(20),
-                IconButton(
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Delete'),
-                              content:
-                                  const Text("Do you wan to delete this image"),
-                              actions: [
-                                TextButton(
+                  )
+                ],
+              )),
+              Container(
+                color: Colors.black,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.share,
+                        color: Colors.white,
+                      ),
+                    ),
+                    addHorizontalSpacing(20),
+                    IconButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Delete'),
+                                content: const Text(
+                                  "Do you wan to delete this image",
+                                ),
+                                actions: [
+                                  TextButton(
                                     onPressed: () {
                                       fileProvider.deleteFile(
                                         'images',
                                         widget.file[currentIndex].file!.name,
                                         widget.file,
                                       );
-                                      Navigator.of(context).pop();
+                                      Navigator.pop(context);
                                       if (widget.file.isEmpty) {
                                         Navigator.pop(context);
                                         return;
@@ -107,21 +112,33 @@ class _FullScreenImageState extends State<FullScreenImage> {
                                         currentIndex--;
                                       }
                                     },
-                                    child: const Text("Yes")),
-                                TextButton(
+                                    child: const Text("Yes"),
+                                  ),
+                                  TextButton(
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
-                                    child: const Text("No"))
-                              ],
-                            );
-                          });
-                    },
-                    icon: const Icon(
-                      Icons.delete,
-                      color: Colors.white,
-                    ))
-              ],
+                                    child: const Text("No"),
+                                  )
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        icon: const Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ))
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            child: Center(
+              child: !fileProvider.isLoading
+                  ? const SizedBox()
+                  : const CircularProgressIndicator(),
             ),
           ),
         ],

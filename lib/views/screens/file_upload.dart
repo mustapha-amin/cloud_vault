@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cloud_vault/providers/files_provider.dart';
 import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/services/database.dart';
@@ -115,8 +113,12 @@ class _FileUploadState extends State<FileUpload> {
             FilledButton.icon(
               onPressed: () {
                 upLoad(context);
-
-                fileProvider.toggleNewFileUploaded();
+                fileProvider.toggleNewFileUploaded(switch (widget.fileType) {
+                  FileType.image => fileProvider.newImageUploaded,
+                  FileType.audio => fileProvider.newaudioUploaded,
+                  FileType.video => fileProvider.newVideoUploaded,
+                  _ => fileProvider.newdocumentUploaded,
+                });
               },
               icon: isLoading
                   ? const SizedBox(
