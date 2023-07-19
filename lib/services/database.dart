@@ -37,6 +37,11 @@ class DatabaseService {
       await ref.putFile(File(file.path!));
       // ignore: use_build_context_synchronously
       context.read<FileProvider>().toggleNewFileUploaded(newFileUploaded!);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Upload successful"),
+        margin: EdgeInsets.all(6),
+        behavior: SnackBarBehavior.floating,
+      ));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("An error occured"),

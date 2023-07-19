@@ -2,6 +2,7 @@ import 'package:cloud_vault/models/cloudvaultfile.dart';
 import 'package:cloud_vault/providers/files_provider.dart';
 import 'package:cloud_vault/utils/spacings.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
+import 'package:cloud_vault/views/widgets/future_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
@@ -62,11 +63,7 @@ class _FullScreenImageState extends State<FullScreenImage> {
                         color: Colors.black,
                       ),
                       child: Center(
-                        child: Image.network(
-                          e.url!,
-                          fit: BoxFit.cover,
-                          filterQuality: FilterQuality.medium,
-                        ),
+                        child: FutureNetWorkImage(imgUrl: e.url!, fit: BoxFit.cover)
                       ),
                     ),
                   )

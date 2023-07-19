@@ -1,46 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:sizer/sizer.dart';
 import 'package:video_player/video_player.dart';
 
-class VideoPlayerScreen extends StatefulWidget {
-  String? url;
+import '../widgets/video_player_widget.dart';
 
-  VideoPlayerScreen({this.url});
+class VideoView extends StatefulWidget {
+  List<String>? urls;
+  int? index;
+  VideoView({this.urls, this.index, super.key});
 
   @override
-  _VideoPlayerScreenState createState() => _VideoPlayerScreenState();
+  State<VideoView> createState() => _VideoViewState();
 }
 
-class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late VideoPlayerController _controller;
+class _VideoViewState extends State<VideoView> {
+  late PageController pageController;
+  int? currentIndex;
 
   @override
   void initState() {
+    currentIndex = widget.index;
+    pageController = PageController(initialPage: currentIndex!);
     super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url!))
-      ..initialize();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Video Player'),
+      body: PageView(
+        onPageChanged: (newIndex) {
+          setState(() {
+            currentIndex = newIndex;
+          });
+        },
+        controller: pageController,
+        children: [
+          ...widget.urls!.map((url) => VideoPlayerWidget(url: url)),
+        ],
       ),
-      body: Center(
-        child: _controller.value.isInitialized
-            ? AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: VideoPlayer(_controller),
-              )
-            : const CircularProgressIndicator(),
-      ),
-      
     );
   }
 }

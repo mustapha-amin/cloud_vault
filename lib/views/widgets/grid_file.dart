@@ -1,3 +1,4 @@
+import 'package:cloud_vault/views/widgets/future_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -46,10 +47,10 @@ class GridFile extends StatelessWidget {
             children: [
               Expanded(
                   child: switch (fileType) {
-                'images' => Image.network(
-                    cloudVaultFile.url!,
-                    fit: BoxFit.cover,
+                'images' => FutureNetWorkImage(
+                    imgUrl: cloudVaultFile.url!,
                     width: 25.w,
+                    fit: BoxFit.cover,
                   ),
                 'audios' => const Icon(Icons.audiotrack),
                 'videos' => const Icon(Icons.video_collection),

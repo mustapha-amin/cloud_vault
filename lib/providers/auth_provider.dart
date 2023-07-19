@@ -42,7 +42,7 @@ class AuthProvider extends ChangeNotifier {
         error = "Incorrect password";
         showErrorDialog(context, error);
       } else if (e.code == "network-request-failed") {
-        error = "A network occured, check your internet settings";
+        error = "A network error occured, check your internet settings";
         showErrorDialog(context, error);
       } else {
         showErrorDialog(context, "An error occured");

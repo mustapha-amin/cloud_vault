@@ -36,9 +36,7 @@ class FileProvider extends ChangeNotifier {
       startLoading();
 
       final data = await DatabaseService().getFiles(fileType);
-      final urls = await Future.wait(
-          data.map((file) async => await file.getDownloadURL()));
-      urls.map((e) => log);
+      final urls = await Future.wait(data.map((file) => file.getDownloadURL()));
 
       final newFiles = data.map((file) {
         final url = urls[data.indexOf(file)];
