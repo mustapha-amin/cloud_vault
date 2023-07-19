@@ -1,5 +1,6 @@
 import 'package:cloud_vault/providers/auth_provider.dart';
 import 'package:cloud_vault/providers/auth_status_provider.dart';
+import 'package:cloud_vault/providers/files_selection_provider.dart';
 import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/providers/files_provider.dart';
 import 'package:cloud_vault/services/onboarding_pref.dart';
@@ -34,7 +35,10 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => FileProvider(),
-        )
+        ),
+        ChangeNotifierProvider(
+          create: (_) => FileSelectionProvider(),
+        ),
       ],
       child: Sizer(
         builder: (context, _, __) {
