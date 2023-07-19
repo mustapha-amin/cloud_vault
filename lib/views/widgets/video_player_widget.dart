@@ -79,19 +79,26 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
               : const SizedBox(),
           Positioned(
             width: 100.w,
-            bottom: 1,
-            child: Slider(
-              min: 0,
-              max: videoPlayerController.value.duration.inMilliseconds
-                  .toDouble(),
-              value: _sliderVal,
-              onChanged: (newVal) {
-                setState(() {
-                  _sliderVal = newVal;
-                  videoPlayerController
-                      .seekTo(Duration(milliseconds: newVal.toInt()));
-                });
-              },
+            bottom: -3,
+            child: SliderTheme(
+              data: SliderThemeData(
+                trackHeight: .5.h,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+              ),
+              child: Slider(
+                min: 0,
+                max: videoPlayerController.value.duration.inMilliseconds
+                    .toDouble(),
+                value: _sliderVal,
+                onChanged: (newVal) {
+                  setState(() {
+                    _sliderVal = newVal;
+                    videoPlayerController
+                        .seekTo(Duration(milliseconds: newVal.toInt()));
+                  });
+                },
+              ),
             ),
           ),
         ],
