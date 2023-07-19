@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:cloud_vault/providers/files_provider.dart';
 import 'package:cloud_vault/views/widgets/future_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +25,44 @@ class GridFile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var filesProvider = Provider.of<FileProvider>(context);
+
+    void deleteFile() {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Delete"),
+            content: Text(
+                "Do you want to delete this ${fileType.substring(0, fileType.length - 1)}?"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  filesProvider.deleteFile(
+                      fileType,
+                      cloudVaultFile.file!.name,
+                      switch (fileType) {
+                        'images' => filesProvider.images,
+                        'videos' => filesProvider.videos,
+                        'audios' => filesProvider.audios,
+                        _ => filesProvider.documents,
+                      });
+                  Navigator.of(context).pop();
+                },
+                child: Text("Yes"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("No"),
+              )
+            ],
+          );
+        },
+      );
+    }
+
     return Stack(
       children: [
         Container(
@@ -80,8 +121,20 @@ class GridFile extends StatelessWidget {
                   ? Colors.white
                   : Colors.black,
             ),
+            onSelected: (value) {
+              value == 'delete' ? deleteFile() : null;
+            },
             itemBuilder: (context) {
-              return [];
+              return [
+                PopupMenuItem(
+                  value: 'delete',
+                  child: const Text("Delete"),
+                ),
+                const PopupMenuItem(
+                  value: 'share',
+                  child: Text("Share"),
+                )
+              ];
             },
           ),
         )

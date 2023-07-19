@@ -1,4 +1,3 @@
-
 import 'package:cloud_vault/providers/files_provider.dart';
 import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/services/files_display_prefs.dart';
@@ -134,7 +133,8 @@ class _FileContentsState extends State<FileContents> {
                                                     index: index,
                                                   ),
                                                 'videos' => VideoView(
-                                                    urls: widget.cloudVaultFiles!
+                                                    urls: widget
+                                                        .cloudVaultFiles!
                                                         .map((e) => e.url!)
                                                         .toList(),
                                                     index: index,
@@ -172,7 +172,8 @@ class _FileContentsState extends State<FileContents> {
                                                     index: index,
                                                   ),
                                                 'videos' => VideoView(
-                                                    urls: widget.cloudVaultFiles!
+                                                    urls: widget
+                                                        .cloudVaultFiles!
                                                         .map((e) => e.url!)
                                                         .toList(),
                                                     index: index,
@@ -212,6 +213,43 @@ class ListFile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var filesProvider = Provider.of<FileProvider>(context);
+    void deleteFile() {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Delete"),
+            content: Text(
+                "Do you want to delete this ${fileType.substring(0, fileType.length - 1)}?"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  filesProvider.deleteFile(
+                      fileType,
+                      cloudVaultFile.file!.name,
+                      switch (fileType) {
+                        'images' => filesProvider.images,
+                        'videos' => filesProvider.videos,
+                        'audios' => filesProvider.audios,
+                        _ => filesProvider.documents,
+                      });
+                  Navigator.of(context).pop();
+                },
+                child: Text("Yes"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("No"),
+              )
+            ],
+          );
+        },
+      );
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -249,14 +287,28 @@ class ListFile extends StatelessWidget {
             ],
           ),
         ),
-        GestureDetector(
-          onTap: () {},
-          child: Icon(
+        PopupMenuButton(
+          icon: Icon(
             Icons.more_vert_rounded,
             color: context.watch<ThemeProvider>().isDark
                 ? Colors.white
                 : Colors.black,
           ),
+          onSelected: (value) {
+            value == 'delete' ? deleteFile() : null;
+          },
+          itemBuilder: (context) {
+            return [
+              PopupMenuItem(
+                value: 'delete',
+                child: const Text("Delete"),
+              ),
+              const PopupMenuItem(
+                value: 'share',
+                child: Text("Share"),
+              )
+            ];
+          },
         ),
       ],
     );
