@@ -3,14 +3,31 @@ import 'package:flutter/material.dart';
 
 class FileSelectionProvider extends ChangeNotifier {
   List<CLoudVaultFile> selectedFiles = [];
+  bool isLongPressed = false;
 
-  void selectFile(CLoudVaultFile cLoudVaultFile) {
-    selectedFiles.add(cLoudVaultFile);
+  void selectFile(CLoudVaultFile cloudVaultFile) {
+    selectedFiles.add(cloudVaultFile);
     notifyListeners();
   }
 
-  void unselectFile(int index) {
-    selectedFiles.removeAt(index);
+  void unselectFile(CLoudVaultFile cloudVaultFile) {
+    selectedFiles.remove(cloudVaultFile);
     notifyListeners();
   }
+
+  void toggleIsLongedPressed() {
+    isLongPressed = !isLongPressed;
+    notifyListeners();
+  }
+
+  bool containsFile(CLoudVaultFile cloudVaultFile) {
+    return selectedFiles.contains(cloudVaultFile);
+  }
+
+  void clearSelected(){
+    selectedFiles.clear();
+    notifyListeners();
+  }
+
+ 
 }

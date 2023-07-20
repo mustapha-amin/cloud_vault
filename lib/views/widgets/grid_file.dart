@@ -111,33 +111,6 @@ class GridFile extends StatelessWidget {
             ],
           ),
         ),
-        Positioned(
-          top: 2,
-          right: 2,
-          child: PopupMenuButton(
-            icon: Icon(
-              Icons.more_vert_rounded,
-              color: context.watch<ThemeProvider>().isDark
-                  ? Colors.white
-                  : Colors.black,
-            ),
-            onSelected: (value) {
-              value == 'delete' ? deleteFile() : null;
-            },
-            itemBuilder: (context) {
-              return [
-                PopupMenuItem(
-                  value: 'delete',
-                  child: const Text("Delete"),
-                ),
-                const PopupMenuItem(
-                  value: 'share',
-                  child: Text("Share"),
-                )
-              ];
-            },
-          ),
-        )
       ],
     );
   }

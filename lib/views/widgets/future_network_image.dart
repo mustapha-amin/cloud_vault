@@ -23,7 +23,7 @@ class FutureNetWorkImage extends StatelessWidget {
       imageUrl: imgUrl,
       width: width,
       fit: fit,
-      filterQuality: FilterQuality.low,
+      filterQuality: FilterQuality.high,
       cacheManager: CacheManager(Config(
         imgUrl,
         stalePeriod: const Duration(days: 1),

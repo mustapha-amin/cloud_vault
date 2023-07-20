@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:cloud_vault/providers/files_provider.dart';
+import 'package:cloud_vault/providers/files_selection_provider.dart';
 import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/services/files_display_prefs.dart';
 import 'package:cloud_vault/utils/extensions.dart';
@@ -9,14 +12,18 @@ import 'package:cloud_vault/views/screens/full_screen_image.dart';
 import 'package:cloud_vault/views/screens/video_view.dart';
 import 'package:cloud_vault/views/widgets/future_network_image.dart';
 import 'package:cloud_vault/views/widgets/loading_widget.dart';
+import 'package:firebase_storage_platform_interface/src/full_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_vault/models/cloudvaultfile.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
+import '../widgets/file_info_modal_sheet.dart';
 import '../widgets/grid_file.dart';
+import '../widgets/list_file.dart';
 
 class FileContents extends StatefulWidget {
   final String title;
@@ -52,11 +59,63 @@ class _FileContentsState extends State<FileContents> {
   @override
   Widget build(BuildContext context) {
     var filesProvider = Provider.of<FileProvider>(context);
+    var fileSelectionProvider = Provider.of<FileSelectionProvider>(context);
+
+    void deleteFiles(List<CLoudVaultFile> selectedfiles) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Delete"),
+            content: Text(
+                "Do you want to delete this ${widget.title.substring(0, widget.title.length - 1)}?"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  for (final file in selectedfiles) {
+                    filesProvider.deleteFile(
+                        widget.title,
+                        file.file!.name,
+                        switch (widget.title) {
+                          'images' => filesProvider.images,
+                          'videos' => filesProvider.videos,
+                          'audios' => filesProvider.audios,
+                          _ => filesProvider.documents,
+                        });
+                  }
+                  fileSelectionProvider.toggleIsLongedPressed();
+                  fileSelectionProvider.clearSelected();
+                  Navigator.of(context).pop();
+                },
+                child: const Text("Yes"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("No"),
+              )
+            ],
+          );
+        },
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title.capitalizeFirst),
         centerTitle: true,
+        leading: Builder(builder: (context) {
+          return IconButton(
+              onPressed: () {
+                fileSelectionProvider.clearSelected();
+                fileSelectionProvider.isLongPressed
+                    ? fileSelectionProvider.toggleIsLongedPressed()
+                    : null;
+                Navigator.pop(context);
+              },
+              icon: Icon(Icons.arrow_back));
+        }),
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -121,35 +180,68 @@ class _FileContentsState extends State<FileContents> {
                                   final cloudVaultFile =
                                       widget.cloudVaultFiles![index];
                                   return GestureDetector(
-                                    onTap: () {
-                                      widget.title == 'documents'
-                                          ? loadPdf(cloudVaultFile.url!)
-                                          : navigateTo(
-                                              context,
-                                              switch (widget.title) {
-                                                'images' => FullScreenImage(
-                                                    file:
-                                                        widget.cloudVaultFiles!,
-                                                    index: index,
-                                                  ),
-                                                'videos' => VideoView(
-                                                    urls: widget
-                                                        .cloudVaultFiles!
-                                                        .map((e) => e.url!)
-                                                        .toList(),
-                                                    index: index,
-                                                  ),
-                                                _ => Container(),
-                                              });
+                                    onLongPress: () {
+                                      fileSelectionProvider.isLongPressed
+                                          ? null
+                                          : fileSelectionProvider
+                                              .toggleIsLongedPressed();
+                                      fileSelectionProvider
+                                          .selectFile(cloudVaultFile);
                                     },
-                                    child: GridFile(
-                                      cloudVaultFile: cloudVaultFile,
-                                      fileType: widget.title,
-                                      extension: widget.title == 'documents'
-                                          ? cloudVaultFile.file!.name
-                                              .split('.')
-                                              .last
-                                          : null,
+                                    onTap: () {
+                                      fileSelectionProvider.isLongPressed
+                                          ? fileSelectionProvider
+                                                  .containsFile(cloudVaultFile)
+                                              ? fileSelectionProvider
+                                                  .unselectFile(cloudVaultFile)
+                                              : fileSelectionProvider
+                                                  .selectFile(cloudVaultFile)
+                                          : widget.title == 'documents'
+                                              ? loadPdf(cloudVaultFile.url!)
+                                              : navigateTo(
+                                                  context,
+                                                  switch (widget.title) {
+                                                    'images' => FullScreenImage(
+                                                        file: widget
+                                                            .cloudVaultFiles!,
+                                                        index: index,
+                                                      ),
+                                                    'videos' => VideoView(
+                                                        urls: widget
+                                                            .cloudVaultFiles!
+                                                            .map((e) => e.url!)
+                                                            .toList(),
+                                                        index: index,
+                                                      ),
+                                                    _ => Container(),
+                                                  });
+                                    },
+                                    child: Stack(
+                                      children: [
+                                        GridFile(
+                                          cloudVaultFile: cloudVaultFile,
+                                          fileType: widget.title,
+                                          extension: widget.title == 'documents'
+                                              ? cloudVaultFile.file!.name
+                                                  .split('.')
+                                                  .last
+                                              : null,
+                                        ),
+                                        fileSelectionProvider.isLongPressed
+                                            ? Icon(
+                                                fileSelectionProvider
+                                                        .containsFile(
+                                                            cloudVaultFile)
+                                                    ? Icons.check_circle
+                                                    : Icons.circle,
+                                                color: fileSelectionProvider
+                                                        .containsFile(
+                                                            cloudVaultFile)
+                                                    ? Colors.brown
+                                                    : Colors.grey,
+                                              )
+                                            : const SizedBox(),
+                                      ],
                                     ),
                                   );
                                 },
@@ -160,157 +252,131 @@ class _FileContentsState extends State<FileContents> {
                                   final cloudVaultFile =
                                       widget.cloudVaultFiles![index];
                                   return GestureDetector(
-                                    onTap: () {
-                                      widget.title == 'documents'
-                                          ? loadPdf(cloudVaultFile.url!)
-                                          : navigateTo(
-                                              context,
-                                              switch (widget.title) {
-                                                'images' => FullScreenImage(
-                                                    file:
-                                                        widget.cloudVaultFiles!,
-                                                    index: index,
-                                                  ),
-                                                'videos' => VideoView(
-                                                    urls: widget
-                                                        .cloudVaultFiles!
-                                                        .map((e) => e.url!)
-                                                        .toList(),
-                                                    index: index,
-                                                  ),
-                                                _ => Container(),
-                                              });
+                                    onLongPress: () {
+                                      fileSelectionProvider.isLongPressed
+                                          ? null
+                                          : fileSelectionProvider
+                                              .toggleIsLongedPressed();
+                                      fileSelectionProvider
+                                          .selectFile(cloudVaultFile);
                                     },
-                                    child: ListFile(
-                                      cloudVaultFile: cloudVaultFile,
-                                      fileType: widget.title,
-                                      extension: widget.title == 'documents'
-                                          ? cloudVaultFile.file!.name
-                                              .split('.')
-                                              .last
-                                          : null,
+                                    onTap: () {
+                                      fileSelectionProvider.isLongPressed
+                                          ? fileSelectionProvider
+                                                  .containsFile(cloudVaultFile)
+                                              ? fileSelectionProvider
+                                                  .unselectFile(cloudVaultFile)
+                                              : fileSelectionProvider
+                                                  .selectFile(cloudVaultFile)
+                                          : widget.title == 'documents'
+                                              ? loadPdf(cloudVaultFile.url!)
+                                              : navigateTo(
+                                                  context,
+                                                  switch (widget.title) {
+                                                    'images' => FullScreenImage(
+                                                        file: widget
+                                                            .cloudVaultFiles!,
+                                                        index: index,
+                                                      ),
+                                                    'videos' => VideoView(
+                                                        urls: widget
+                                                            .cloudVaultFiles!
+                                                            .map((e) => e.url!)
+                                                            .toList(),
+                                                        index: index,
+                                                      ),
+                                                    _ => Container(),
+                                                  });
+                                    },
+                                    child: Row(
+                                      children: [
+                                        fileSelectionProvider.isLongPressed
+                                            ? Icon(
+                                                fileSelectionProvider
+                                                        .containsFile(widget
+                                                                .cloudVaultFiles![
+                                                            index])
+                                                    ? Icons.check_circle_sharp
+                                                    : Icons.circle,
+                                                color: fileSelectionProvider
+                                                        .containsFile(widget
+                                                                .cloudVaultFiles![
+                                                            index])
+                                                    ? Theme.of(context)
+                                                        .primaryColor
+                                                    : Colors.grey,
+                                              )
+                                            : const SizedBox(),
+                                        ListFile(
+                                          cloudVaultFile: cloudVaultFile,
+                                          fileType: widget.title,
+                                          extension: widget.title == 'documents'
+                                              ? cloudVaultFile.file!.name
+                                                  .split('.')
+                                                  .last
+                                              : null,
+                                        ),
+                                      ],
                                     ),
                                   );
                                 },
                               ),
               ),
             ),
-    );
-  }
-}
-
-class ListFile extends StatelessWidget {
-  ListFile({
-    super.key,
-    this.extension,
-    required this.fileType,
-    required this.cloudVaultFile,
-  });
-
-  final CLoudVaultFile cloudVaultFile;
-  final String fileType;
-  String? extension;
-
-  @override
-  Widget build(BuildContext context) {
-    var filesProvider = Provider.of<FileProvider>(context);
-    void deleteFile() {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Delete"),
-            content: Text(
-                "Do you want to delete this ${fileType.substring(0, fileType.length - 1)}?"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  filesProvider.deleteFile(
-                      fileType,
-                      cloudVaultFile.file!.name,
-                      switch (fileType) {
-                        'images' => filesProvider.images,
-                        'videos' => filesProvider.videos,
-                        'audios' => filesProvider.audios,
-                        _ => filesProvider.documents,
-                      });
-                  Navigator.of(context).pop();
-                },
-                child: Text("Yes"),
+      bottomNavigationBar: fileSelectionProvider.isLongPressed
+          ? SizedBox(
+              height: 8.h,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                      onPressed: () {
+                        fileSelectionProvider.toggleIsLongedPressed();
+                        fileSelectionProvider.clearSelected();
+                      },
+                      icon: const Icon(Icons.cancel_outlined)),
+                  if (fileSelectionProvider.selectedFiles.length == 1)
+                    IconButton(
+                        onPressed: () async {
+                          final metaData = await fileSelectionProvider
+                              .selectedFiles[0].file!
+                              .getMetadata();
+                          // ignore: use_build_context_synchronously
+                          showModalBottomSheet(
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(5),
+                                topRight: Radius.circular(5),
+                              ),
+                            ),
+                            context: context,
+                            builder: (context) {
+                              return FileDetailSheet(metaData: metaData);
+                            },
+                          );
+                        },
+                        icon: const Icon(Icons.info_rounded)),
+                  IconButton(
+                      onPressed: () {
+                        final selectedFiles = widget.cloudVaultFiles!
+                            .where((file) => fileSelectionProvider.selectedFiles
+                                .contains(file))
+                            .toList();
+                        deleteFiles(selectedFiles);
+                      },
+                      icon: const Icon(Icons.delete)),
+                  if (fileSelectionProvider.selectedFiles.length == 1)
+                    IconButton(
+                        onPressed: () {
+                          Share.share(
+                            "Mustapha is inviting you to view his cloudvault file\n\n${fileSelectionProvider.selectedFiles[0].url!}",
+                          );
+                        },
+                        icon: const Icon(Icons.share)),
+                ],
               ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text("No"),
-              )
-            ],
-          );
-        },
-      );
-    }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              SizedBox(
-                width: 12.w,
-                height: 12.w,
-                child: switch (fileType) {
-                  'images' => FutureNetWorkImage(
-                      imgUrl: cloudVaultFile.url!, fit: BoxFit.fill),
-                  'audios' => const Icon(Icons.audiotrack),
-                  'videos' => const Icon(Icons.video_collection),
-                  _ => Image.asset(
-                      extension == 'pdf'
-                          ? 'assets/images/pdf.png'
-                          : extension == 'docx'
-                              ? 'assets/images/word.png'
-                              : 'assets/images/pptx-file.png',
-                      fit: BoxFit.fill,
-                      height: 25.w,
-                    )
-                },
-              ),
-              addHorizontalSpacing(10),
-              Text(
-                cloudVaultFile.file!.name.length < 30
-                    ? cloudVaultFile.file!.name
-                    : '${cloudVaultFile.file!.name.substring(0, 29)}...',
-                style: kTextStyle(context: context, size: 12),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuButton(
-          icon: Icon(
-            Icons.more_vert_rounded,
-            color: context.watch<ThemeProvider>().isDark
-                ? Colors.white
-                : Colors.black,
-          ),
-          onSelected: (value) {
-            value == 'delete' ? deleteFile() : null;
-          },
-          itemBuilder: (context) {
-            return [
-              PopupMenuItem(
-                value: 'delete',
-                child: const Text("Delete"),
-              ),
-              const PopupMenuItem(
-                value: 'share',
-                child: Text("Share"),
-              )
-            ];
-          },
-        ),
-      ],
+            )
+          : null,
     );
   }
 }
