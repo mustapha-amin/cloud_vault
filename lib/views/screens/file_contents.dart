@@ -1,29 +1,28 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_vault/providers/files_provider.dart';
 import 'package:cloud_vault/providers/files_selection_provider.dart';
-import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/services/files_display_prefs.dart';
+import 'package:cloud_vault/services/pdf_service.dart';
 import 'package:cloud_vault/utils/extensions.dart';
 import 'package:cloud_vault/utils/navigations.dart';
-import 'package:cloud_vault/utils/spacings.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
 import 'package:cloud_vault/views/screens/full_screen_image.dart';
 import 'package:cloud_vault/views/screens/video_view.dart';
-import 'package:cloud_vault/views/widgets/future_network_image.dart';
 import 'package:cloud_vault/views/widgets/loading_widget.dart';
-import 'package:firebase_storage_platform_interface/src/full_metadata.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_vault/models/cloudvaultfile.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:video_player/video_player.dart';
 import '../widgets/file_info_modal_sheet.dart';
 import '../widgets/grid_file.dart';
 import '../widgets/list_file.dart';
+import 'pdf_view.dart';
 
 class FileContents extends StatefulWidget {
   final String title;
@@ -188,7 +187,10 @@ class _FileContentsState extends State<FileContents> {
                                       fileSelectionProvider
                                           .selectFile(cloudVaultFile);
                                     },
-                                    onTap: () {
+                                    onTap: () async {
+                                      final data = await PDFService.loadPDF(
+                                          cloudVaultFile.url!);
+                                      log(data!);
                                       fileSelectionProvider.isLongPressed
                                           ? fileSelectionProvider
                                                   .containsFile(cloudVaultFile)
@@ -197,7 +199,7 @@ class _FileContentsState extends State<FileContents> {
                                               : fileSelectionProvider
                                                   .selectFile(cloudVaultFile)
                                           : widget.title == 'documents'
-                                              ? loadPdf(cloudVaultFile.url!)
+                                              ? PDFService.openLocalFile(data)
                                               : navigateTo(
                                                   context,
                                                   switch (widget.title) {
@@ -365,6 +367,10 @@ class _FileContentsState extends State<FileContents> {
                         deleteFiles(selectedFiles);
                       },
                       icon: const Icon(Icons.delete)),
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.cloud_download_sharp),
+                  ),
                   if (fileSelectionProvider.selectedFiles.length == 1)
                     IconButton(
                         onPressed: () {

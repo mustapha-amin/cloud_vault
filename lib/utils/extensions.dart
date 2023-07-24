@@ -20,3 +20,9 @@ extension Capitalize on String {
     return this[0].toUpperCase() + substring(1, length);
   }
 }
+
+extension BaseName on String {
+  String get basename {
+    return isNotEmpty ? split('/').last : '';
+  }
+}
