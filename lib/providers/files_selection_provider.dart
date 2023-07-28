@@ -28,6 +28,5 @@ class FileSelectionProvider extends ChangeNotifier {
     selectedFiles.clear();
     notifyListeners();
   }
-
  
 }

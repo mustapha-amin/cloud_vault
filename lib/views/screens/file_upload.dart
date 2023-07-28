@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_vault/providers/files_provider.dart';
 import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/services/database.dart';
@@ -7,6 +9,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+
+import '../widgets/file_widget.dart';
 
 class FileUpload extends StatefulWidget {
   final FilePickerResult pickedFile;
@@ -32,6 +36,7 @@ class _FileUploadState extends State<FileUpload> {
   }
 
   void upLoad(BuildContext context) async {
+    var fileProvider = Provider.of<FileProvider>(context, listen: false);
     setState(() {
       isLoading = !isLoading;
     });
@@ -42,20 +47,19 @@ class _FileUploadState extends State<FileUpload> {
           file,
           widget.fileType == FileType.custom
               ? "document"
-              : widget.fileType.name);
+              : widget.fileType.name,
+          switch (widget.fileType) {
+            FileType.image => fileProvider.newImageUploaded,
+            FileType.video => fileProvider.newVideoUploaded,
+            FileType.audio => fileProvider.newaudioUploaded,
+            _ => fileProvider.newdocumentUploaded
+          });
     }
     setState(() {
       isLoading = !isLoading;
     });
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text("Uploaded successfully"),
-      margin: EdgeInsets.all(6),
-      duration: Duration(milliseconds: 900),
-      behavior: SnackBarBehavior.floating,
-    ));
     await Future.delayed(const Duration(milliseconds: 900));
     ScaffoldMessenger.of(context).clearSnackBars();
-    // ignore: use_build_context_synchronously
     Navigator.pop(context);
   }
 
@@ -138,47 +142,3 @@ class _FileUploadState extends State<FileUpload> {
   }
 }
 
-class FileWidget extends StatelessWidget {
-  bool isSelected;
-  FileType fileType;
-
-  FileWidget({
-    required this.isSelected,
-    required this.fileType,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5),
-      width: 25.w,
-      height: 25.w,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: isSelected
-            ? Border.all(
-                width: 3,
-                color: Theme.of(context).primaryColor,
-              )
-            : Border.all(
-                width: 0.2,
-                color: context.watch<ThemeProvider>().isDark
-                    ? Colors.grey[300]!
-                    : Colors.grey[800]!,
-              ),
-      ),
-      child: Icon(
-        fileType == FileType.image
-            ? Icons.image
-            : fileType == FileType.video
-                ? Icons.video_collection
-                : fileType == FileType.audio
-                    ? Icons.audio_file
-                    : Icons.file_copy,
-        color:
-            context.watch<ThemeProvider>().isDark ? Colors.grey : Colors.black,
-      ),
-    );
-  }
-}

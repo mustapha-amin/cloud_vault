@@ -1,11 +1,7 @@
 import 'package:cloud_vault/providers/auth_status_provider.dart';
 import 'package:cloud_vault/providers/theme_provider.dart';
-import 'package:cloud_vault/utils/navigations.dart';
-import 'package:cloud_vault/utils/reg_exprs.dart';
-import 'package:cloud_vault/utils/spacings.dart';
 import 'package:cloud_vault/utils/textfield_decoration.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
-import 'package:cloud_vault/views/screens/auth/verify_email.dart';
 import 'package:cloud_vault/views/widgets/loading_widget.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';

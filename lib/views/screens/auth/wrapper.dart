@@ -1,7 +1,6 @@
 import 'package:cloud_vault/utils/auth_constants.dart';
 import 'package:cloud_vault/views/screens/auth/authenticate.dart';
 import 'package:cloud_vault/views/screens/auth/verify_email.dart';
-import 'package:cloud_vault/views/screens/home.dart';
 import 'package:cloud_vault/views/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
 

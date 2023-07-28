@@ -1,14 +1,14 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_vault/models/cloudvaultfile.dart';
 import 'package:cloud_vault/models/user.dart';
 import 'package:cloud_vault/providers/files_provider.dart';
 import 'package:cloud_vault/utils/auth_constants.dart';
-import 'package:cloud_vault/utils/extensions.dart';
+import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class DatabaseService {
@@ -37,12 +37,14 @@ class DatabaseService {
       await ref.putFile(File(file.path!));
       // ignore: use_build_context_synchronously
       context.read<FileProvider>().toggleNewFileUploaded(newFileUploaded!);
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Upload successful"),
         margin: EdgeInsets.all(6),
         behavior: SnackBarBehavior.floating,
       ));
     } catch (e) {
+      log(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("An error occured"),
         margin: EdgeInsets.all(6),
@@ -61,5 +63,14 @@ class DatabaseService {
   Future<void> deleteFile(String? fileType, String? fileName) async {
     final path = '/${AuthConstants.userId}/$fileType/$fileName';
     await firebaseStorage.ref(path).delete();
+  }
+
+  downloadFile(String? url) async {
+    Directory dir = await getApplicationDocumentsDirectory();
+    var data = await Dio().downloadUri(
+      Uri.parse(url!), dir.path, onReceiveProgress: (count, total){
+         
+      }
+    );
   }
 }

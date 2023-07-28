@@ -76,7 +76,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                     ),
                   ),
                 )
-              : const SizedBox(),
+              : const CircularProgressIndicator(),
           Positioned(
             width: 100.w,
             bottom: -3,

@@ -69,6 +69,7 @@ class AuthProvider extends ChangeNotifier {
       await AuthConstants.user!.updateDisplayName(name);
       await AuthConstants.user!.updateEmail(email);
       toggleLoading();
+      // ignore: use_build_context_synchronously
       navigateTo(context, const VerifyEmail());
     } on FirebaseException catch (e) {
       toggleLoading();

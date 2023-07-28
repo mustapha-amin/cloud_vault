@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:cloud_vault/providers/files_provider.dart';
 import 'package:cloud_vault/providers/files_selection_provider.dart';
@@ -11,18 +10,14 @@ import 'package:cloud_vault/utils/textstyle.dart';
 import 'package:cloud_vault/views/screens/full_screen_image.dart';
 import 'package:cloud_vault/views/screens/video_view.dart';
 import 'package:cloud_vault/views/widgets/loading_widget.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_vault/models/cloudvaultfile.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 import 'package:sizer/sizer.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../widgets/file_info_modal_sheet.dart';
 import '../widgets/grid_file.dart';
 import '../widgets/list_file.dart';
-import 'pdf_view.dart';
 
 class FileContents extends StatefulWidget {
   final String title;
@@ -47,12 +42,6 @@ class _FileContentsState extends State<FileContents> {
   void initState() {
     isGrid = FileDisplayPreference.isGrid();
     super.initState();
-  }
-
-  void loadPdf(String url) async {
-    await canLaunchUrl(Uri.parse(url))
-        ? await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication)
-        : null;
   }
 
   @override
@@ -188,8 +177,9 @@ class _FileContentsState extends State<FileContents> {
                                           .selectFile(cloudVaultFile);
                                     },
                                     onTap: () async {
-                                      final data = await PDFService.loadPDF(
-                                          cloudVaultFile.url!);
+                                      final data =
+                                          await PDFService.loadDocument(
+                                              context, cloudVaultFile.url!);
                                       log(data!);
                                       fileSelectionProvider.isLongPressed
                                           ? fileSelectionProvider
@@ -200,6 +190,7 @@ class _FileContentsState extends State<FileContents> {
                                                   .selectFile(cloudVaultFile)
                                           : widget.title == 'documents'
                                               ? PDFService.openLocalFile(data)
+                                              // ignore: use_build_context_synchronously
                                               : navigateTo(
                                                   context,
                                                   switch (widget.title) {
@@ -262,7 +253,7 @@ class _FileContentsState extends State<FileContents> {
                                       fileSelectionProvider
                                           .selectFile(cloudVaultFile);
                                     },
-                                    onTap: () {
+                                    onTap: () async {
                                       fileSelectionProvider.isLongPressed
                                           ? fileSelectionProvider
                                                   .containsFile(cloudVaultFile)
@@ -271,7 +262,21 @@ class _FileContentsState extends State<FileContents> {
                                               : fileSelectionProvider
                                                   .selectFile(cloudVaultFile)
                                           : widget.title == 'documents'
-                                              ? loadPdf(cloudVaultFile.url!)
+                                              ? await PDFService.fileExists(
+                                                      cloudVaultFile.url!)
+                                                  ? PDFService.loadDocument(
+                                                      context,
+                                                      cloudVaultFile.url)
+                                                  : showDialog(
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return AlertDialog(
+                                                          title: Text(
+                                                              "Download file"),
+                                                          content: Text(
+                                                              "This document has to be downloaded before it can be viewed"),
+                                                        );
+                                                      })
                                               : navigateTo(
                                                   context,
                                                   switch (widget.title) {

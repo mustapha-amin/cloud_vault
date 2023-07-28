@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 
 import 'package:cloud_vault/utils/navigations.dart';
@@ -17,21 +19,20 @@ class FileTypesModalSheet extends StatefulWidget {
 class _FileTypesModalSheetState extends State<FileTypesModalSheet> {
   FilePicker filePicker = FilePicker.platform;
 
-  Future<void> pickFile(FileType fileType) async {
+  Future<void> pickFile(FileType fileType, {bool? isAudio}) async {
     FilePickerResult? result = await filePicker.pickFiles(
-      type: fileType,
+      type: isAudio! ? FileType.audio : fileType,
       allowMultiple: true,
       allowedExtensions:
           fileType == FileType.custom ? ['pdf', 'doc', 'docx'] : null,
     );
 
     if (result != null) {
-      // ignore: use_build_context_synchronously
       navigateTo(
           context,
           FileUpload(
             pickedFile: result,
-            fileType: fileType,
+            fileType: isAudio ? FileType.audio : fileType,
           ));
     }
   }
@@ -67,7 +68,7 @@ class _FileTypesModalSheetState extends State<FileTypesModalSheet> {
             k.FileType(
               iconData: Icons.audio_file_outlined,
               title: "Audio",
-              onTap: () => pickFile(FileType.audio),
+              onTap: () => pickFile(FileType.any, isAudio: true),
             ),
             k.FileType(
               iconData: Icons.file_copy_outlined,

@@ -1,7 +1,5 @@
-import 'dart:developer';
 import 'package:cloud_vault/models/cloudvaultfile.dart';
 import 'package:cloud_vault/services/database.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 class FileProvider extends ChangeNotifier {
