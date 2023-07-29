@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 
 import 'package:cloud_vault/providers/files_provider.dart';
@@ -56,7 +58,7 @@ class _FileContentsState extends State<FileContents> {
           return AlertDialog(
             title: const Text("Delete"),
             content: Text(
-                "Do you want to delete this ${widget.title.substring(0, widget.title.length - 1)}?"),
+                "Do you want to delete the selected ${fileSelectionProvider.selectedFiles.length == 1 ? widget.title.substring(0, widget.title.length - 1) : widget.title}?"),
             actions: [
               TextButton(
                 onPressed: () {
@@ -102,7 +104,7 @@ class _FileContentsState extends State<FileContents> {
                     : null;
                 Navigator.pop(context);
               },
-              icon: Icon(Icons.arrow_back));
+              icon: const Icon(Icons.arrow_back));
         }),
         actions: [
           Padding(
@@ -133,6 +135,7 @@ class _FileContentsState extends State<FileContents> {
                     'audio' => filesProvider.newaudioUploaded,
                     _ => filesProvider.newdocumentUploaded,
                   },
+                  false,
                 ),
                 await filesProvider.loadFiles(
                   widget.cloudVaultFiles!,
@@ -177,10 +180,8 @@ class _FileContentsState extends State<FileContents> {
                                           .selectFile(cloudVaultFile);
                                     },
                                     onTap: () async {
-                                      final data =
-                                          await PDFService.loadDocument(
-                                              context, cloudVaultFile.url!);
-                                      log(data!);
+                                      String? data;
+
                                       fileSelectionProvider.isLongPressed
                                           ? fileSelectionProvider
                                                   .containsFile(cloudVaultFile)
@@ -189,7 +190,13 @@ class _FileContentsState extends State<FileContents> {
                                               : fileSelectionProvider
                                                   .selectFile(cloudVaultFile)
                                           : widget.title == 'documents'
-                                              ? PDFService.openLocalFile(data)
+                                              ? {
+                                                  data = await PDFService
+                                                      .loadDocument(context,
+                                                          cloudVaultFile.url!),
+                                                  PDFService.openLocalFile(
+                                                      data!)
+                                                }
                                               // ignore: use_build_context_synchronously
                                               : navigateTo(
                                                   context,
@@ -254,6 +261,9 @@ class _FileContentsState extends State<FileContents> {
                                           .selectFile(cloudVaultFile);
                                     },
                                     onTap: () async {
+                                      bool val = await PDFService.fileExists(
+                                          cloudVaultFile.url!);
+                                      log(val.toString());
                                       fileSelectionProvider.isLongPressed
                                           ? fileSelectionProvider
                                                   .containsFile(cloudVaultFile)
@@ -264,17 +274,36 @@ class _FileContentsState extends State<FileContents> {
                                           : widget.title == 'documents'
                                               ? await PDFService.fileExists(
                                                       cloudVaultFile.url!)
-                                                  ? PDFService.loadDocument(
-                                                      context,
-                                                      cloudVaultFile.url)
+                                                  ? PDFService.openLocalFile(
+                                                      cloudVaultFile.url!)
                                                   : showDialog(
                                                       context: context,
                                                       builder: (context) {
                                                         return AlertDialog(
-                                                          title: Text(
+                                                          title: const Text(
                                                               "Download file"),
-                                                          content: Text(
+                                                          content: const Text(
                                                               "This document has to be downloaded before it can be viewed"),
+                                                          actions: [
+                                                            TextButton(
+                                                                onPressed: () {
+                                                                  PDFService.loadDocument(
+                                                                      context,
+                                                                      cloudVaultFile
+                                                                          .url);
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                child: const Text(
+                                                                    "Proceed")),
+                                                            TextButton(
+                                                                onPressed: () {
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                child: const Text(
+                                                                    "Cancel"))
+                                                          ],
                                                         );
                                                       })
                                               : navigateTo(
@@ -374,7 +403,7 @@ class _FileContentsState extends State<FileContents> {
                       icon: const Icon(Icons.delete)),
                   IconButton(
                     onPressed: () {},
-                    icon: Icon(Icons.cloud_download_sharp),
+                    icon: const Icon(Icons.cloud_download_sharp),
                   ),
                   if (fileSelectionProvider.selectedFiles.length == 1)
                     IconButton(

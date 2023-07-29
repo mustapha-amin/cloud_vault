@@ -25,16 +25,13 @@ class FileTile extends StatelessWidget {
     var filesProvider = Provider.of<FileProvider>(context);
     return GestureDetector(
       onTap: () {
-        filesProvider.loadFiles(
-          cloudVaultFiles,
-          title.toLowerCase(),
-          newFileupladed: switch (title.toLowerCase()) {
-            'image' => filesProvider.newImageUploaded,
-            'videos' => filesProvider.newVideoUploaded,
-            'audios' => filesProvider.newaudioUploaded,
-            _ => filesProvider.newdocumentUploaded,
-          }
-        );
+        filesProvider.loadFiles(cloudVaultFiles, title.toLowerCase(),
+            newFileupladed: switch (title.toLowerCase()) {
+              'images' => filesProvider.newImageUploaded,
+              'videos' => filesProvider.newVideoUploaded,
+              'audios' => filesProvider.newaudioUploaded,
+              _ => filesProvider.newdocumentUploaded,
+            });
         navigateTo(
           context,
           FileContents(

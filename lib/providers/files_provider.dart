@@ -23,8 +23,8 @@ class FileProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleNewFileUploaded(bool val) {
-    val = !val;
+  void toggleNewFileUploaded(bool newfileUploaded, bool value) {
+    newImageUploaded = value;
     notifyListeners();
   }
 
@@ -46,7 +46,7 @@ class FileProvider extends ChangeNotifier {
 
       stopLoading();
 
-      toggleNewFileUploaded(newFileupladed!);
+      toggleNewFileUploaded(newFileupladed!, false);
     }
   }
 

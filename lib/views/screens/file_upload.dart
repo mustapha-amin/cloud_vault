@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:developer';
+
 import 'package:cloud_vault/providers/files_provider.dart';
 import 'package:cloud_vault/providers/theme_provider.dart';
 import 'package:cloud_vault/services/database.dart';
@@ -43,21 +45,23 @@ class _FileUploadState extends State<FileUpload> {
 
     for (var file in widget.pickedFile.files) {
       await DatabaseService().uploadFile(
-          context,
-          file,
-          widget.fileType == FileType.custom
-              ? "document"
-              : widget.fileType.name,
-          switch (widget.fileType) {
-            FileType.image => fileProvider.newImageUploaded,
-            FileType.video => fileProvider.newVideoUploaded,
-            FileType.audio => fileProvider.newaudioUploaded,
-            _ => fileProvider.newdocumentUploaded
-          });
+        context,
+        file,
+        widget.fileType == FileType.custom ? "document" : widget.fileType.name,
+      );
     }
     setState(() {
       isLoading = !isLoading;
     });
+    fileProvider.toggleNewFileUploaded(
+      switch (widget.fileType) {
+        FileType.audio => fileProvider.newaudioUploaded,
+        FileType.image => fileProvider.newImageUploaded,
+        FileType.video => fileProvider.newVideoUploaded,
+        _ => fileProvider.newdocumentUploaded,
+      },
+      true,
+    );
     await Future.delayed(const Duration(milliseconds: 900));
     ScaffoldMessenger.of(context).clearSnackBars();
     Navigator.pop(context);
@@ -66,7 +70,6 @@ class _FileUploadState extends State<FileUpload> {
   @override
   Widget build(BuildContext context) {
     List<PlatformFile> files = widget.pickedFile.files;
-    var fileProvider = Provider.of<FileProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Upload files"),
@@ -117,12 +120,6 @@ class _FileUploadState extends State<FileUpload> {
             FilledButton.icon(
               onPressed: () {
                 upLoad(context);
-                fileProvider.toggleNewFileUploaded(switch (widget.fileType) {
-                  FileType.image => fileProvider.newImageUploaded,
-                  FileType.audio => fileProvider.newaudioUploaded,
-                  FileType.video => fileProvider.newVideoUploaded,
-                  _ => fileProvider.newdocumentUploaded,
-                });
               },
               icon: isLoading
                   ? const SizedBox(
@@ -141,4 +138,3 @@ class _FileUploadState extends State<FileUpload> {
     );
   }
 }
-

@@ -19,28 +19,33 @@ class FutureNetWorkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CachedNetworkImage(
-      imageUrl: imgUrl,
-      width: width,
-      fit: fit,
-      filterQuality: FilterQuality.high,
-      cacheManager: CacheManager(Config(
-        imgUrl,
-        stalePeriod: const Duration(days: 1),
-      )),
-      fadeInDuration: const Duration(milliseconds: 300),
-      fadeOutDuration: const Duration(milliseconds: 300),
-      placeholder: (context, imgUrl) => Container(
+    return InteractiveViewer(
+      boundaryMargin: EdgeInsets.all(20.0),
+      minScale: 0.5,
+      maxScale: 5.0,
+      child: CachedNetworkImage(
+        imageUrl: imgUrl,
         width: width,
-        height: 30.h,
-        color: Colors.grey,
-      ).animate()
-        ..shimmer(
-          colors: [
-            Colors.white,
-            Colors.grey,
-          ],
-        ),
+        fit: fit,
+        filterQuality: FilterQuality.high,
+        cacheManager: CacheManager(Config(
+          imgUrl,
+          stalePeriod: const Duration(days: 1),
+        )),
+        fadeInDuration: const Duration(milliseconds: 300),
+        fadeOutDuration: const Duration(milliseconds: 300),
+        placeholder: (context, imgUrl) => Container(
+          width: width,
+          height: 30.h,
+          color: Colors.grey,
+        ).animate()
+          ..shimmer(
+            colors: [
+              Colors.white,
+              Colors.grey,
+            ],
+          ),
+      ),
     );
   }
 }

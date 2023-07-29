@@ -47,6 +47,7 @@ class GridFile extends StatelessWidget {
                         'audios' => filesProvider.audios,
                         _ => filesProvider.documents,
                       });
+
                   Navigator.of(context).pop();
                 },
                 child: Text("Yes"),
@@ -93,8 +94,14 @@ class GridFile extends StatelessWidget {
                     width: 25.w,
                     fit: BoxFit.cover,
                   ),
-                'audios' => const Icon(Icons.audiotrack),
-                'videos' => const Icon(Icons.video_collection),
+                'audios' => const Icon(
+                    Icons.audiotrack,
+                    size: 40,
+                  ),
+                'videos' => const Icon(
+                    Icons.video_collection,
+                    size: 40,
+                  ),
                 _ => Image.asset(
                     extension == 'pdf'
                         ? 'assets/images/pdf.png'

@@ -30,13 +30,13 @@ class DatabaseService {
 
   Future<void> uploadFile(
       BuildContext context, PlatformFile file, String? fileType,
-      [bool? newFileUploaded]) async {
+      ) async {
     try {
       final path = '${AuthConstants.userId}/${fileType}s/${file.name}';
       final ref = firebaseStorage.ref().child(path);
       await ref.putFile(File(file.path!));
       // ignore: use_build_context_synchronously
-      context.read<FileProvider>().toggleNewFileUploaded(newFileUploaded!);
+      
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Upload successful"),
@@ -67,10 +67,8 @@ class DatabaseService {
 
   downloadFile(String? url) async {
     Directory dir = await getApplicationDocumentsDirectory();
-    var data = await Dio().downloadUri(
-      Uri.parse(url!), dir.path, onReceiveProgress: (count, total){
-         
-      }
+    await Dio().downloadUri(
+      Uri.parse(url!), dir.path
     );
   }
 }

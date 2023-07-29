@@ -20,8 +20,9 @@ class _FileTypesModalSheetState extends State<FileTypesModalSheet> {
   FilePicker filePicker = FilePicker.platform;
 
   Future<void> pickFile(FileType fileType, {bool? isAudio}) async {
+    isAudio ??= false;
     FilePickerResult? result = await filePicker.pickFiles(
-      type: isAudio! ? FileType.audio : fileType,
+      type: isAudio ? FileType.audio : fileType,
       allowMultiple: true,
       allowedExtensions:
           fileType == FileType.custom ? ['pdf', 'doc', 'docx'] : null,
