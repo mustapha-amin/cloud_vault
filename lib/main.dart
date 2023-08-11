@@ -45,9 +45,7 @@ void main() async {
           var isDark = Provider.of<ThemeProvider>(context).isDark;
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: OnboardingPreference.isFirstTime()
-                ? const Onboarding()
-                : const Wrapper(),
+            home: const Onboarding(),
             theme: Apptheme.themeData(isDark, context),
           );
         },

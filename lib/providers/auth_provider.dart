@@ -30,7 +30,7 @@ class AuthProvider extends ChangeNotifier {
         email: email!,
         password: password!,
       );
-      toggleLoading();
+
       // ignore: use_build_context_synchronously
       navigateTo(context, const Home());
     } on FirebaseException catch (e) {
@@ -68,7 +68,7 @@ class AuthProvider extends ChangeNotifier {
       ));
       await AuthConstants.user!.updateDisplayName(name);
       await AuthConstants.user!.updateEmail(email);
-      toggleLoading();
+     // toggleLoading();
       // ignore: use_build_context_synchronously
       navigateTo(context, const VerifyEmail());
     } on FirebaseException catch (e) {

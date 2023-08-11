@@ -94,8 +94,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 onChanged: (newVal) {
                   setState(() {
                     _sliderVal = newVal;
-                    videoPlayerController
-                        .seekTo(Duration(milliseconds: newVal.toInt()));
+                    videoPlayerController.seekTo(
+                      Duration(milliseconds: newVal.toInt()),
+                    );
                   });
                 },
               ),

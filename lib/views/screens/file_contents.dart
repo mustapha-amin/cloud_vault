@@ -9,6 +9,7 @@ import 'package:cloud_vault/services/pdf_service.dart';
 import 'package:cloud_vault/utils/extensions.dart';
 import 'package:cloud_vault/utils/navigations.dart';
 import 'package:cloud_vault/utils/textstyle.dart';
+import 'package:cloud_vault/views/screens/audio_player_screen.dart';
 import 'package:cloud_vault/views/screens/full_screen_image.dart';
 import 'package:cloud_vault/views/screens/video_view.dart';
 import 'package:cloud_vault/views/widgets/loading_widget.dart';
@@ -180,8 +181,6 @@ class _FileContentsState extends State<FileContents> {
                                           .selectFile(cloudVaultFile);
                                     },
                                     onTap: () async {
-                                      String? data;
-
                                       fileSelectionProvider.isLongPressed
                                           ? fileSelectionProvider
                                                   .containsFile(cloudVaultFile)
@@ -190,14 +189,13 @@ class _FileContentsState extends State<FileContents> {
                                               : fileSelectionProvider
                                                   .selectFile(cloudVaultFile)
                                           : widget.title == 'documents'
-                                              ? {
-                                                  data = await PDFService
-                                                      .loadDocument(context,
-                                                          cloudVaultFile.url!),
-                                                  PDFService.openLocalFile(
-                                                      data!)
-                                                }
-                                              // ignore: use_build_context_synchronously
+                                              ? await PDFService.fileExists(
+                                                      cloudVaultFile.url!)
+                                                  ? PDFService.openLocalFile(
+                                                      cloudVaultFile.url!)
+                                                  : PDFService.loadDocument(
+                                                      context,
+                                                      cloudVaultFile.url)
                                               : navigateTo(
                                                   context,
                                                   switch (widget.title) {
@@ -213,7 +211,11 @@ class _FileContentsState extends State<FileContents> {
                                                             .toList(),
                                                         index: index,
                                                       ),
-                                                    _ => Container(),
+                                                    _ => AudioView(
+                                                        files: widget
+                                                            .cloudVaultFiles!,
+                                                        index: index,
+                                                      ),
                                                   });
                                     },
                                     child: Stack(
@@ -248,6 +250,7 @@ class _FileContentsState extends State<FileContents> {
                               )
                             : ListView.builder(
                                 itemCount: widget.cloudVaultFiles!.length,
+                                
                                 itemBuilder: (context, index) {
                                   final cloudVaultFile =
                                       widget.cloudVaultFiles![index];
@@ -261,9 +264,6 @@ class _FileContentsState extends State<FileContents> {
                                           .selectFile(cloudVaultFile);
                                     },
                                     onTap: () async {
-                                      bool val = await PDFService.fileExists(
-                                          cloudVaultFile.url!);
-                                      log(val.toString());
                                       fileSelectionProvider.isLongPressed
                                           ? fileSelectionProvider
                                                   .containsFile(cloudVaultFile)
@@ -407,12 +407,13 @@ class _FileContentsState extends State<FileContents> {
                   ),
                   if (fileSelectionProvider.selectedFiles.length == 1)
                     IconButton(
-                        onPressed: () {
-                          Share.share(
-                            "Mustapha is inviting you to view his cloudvault file\n\n${fileSelectionProvider.selectedFiles[0].url!}",
-                          );
-                        },
-                        icon: const Icon(Icons.share)),
+                      onPressed: () {
+                        Share.share(
+                          "Mustapha is inviting you to view his cloudvault file\n\n${fileSelectionProvider.selectedFiles[0].url!}",
+                        );
+                      },
+                      icon: const Icon(Icons.share),
+                    ),
                 ],
               ),
             )

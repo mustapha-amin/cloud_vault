@@ -28,6 +28,7 @@ dependencies:
   video_player: ^2.7.0
   share: ^2.0.4
   open_file_plus:
+  audioplayers: ^5.0.0
 
 dev_dependencies:
   flutter_test:
